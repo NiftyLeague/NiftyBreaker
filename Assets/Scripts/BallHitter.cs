@@ -6,13 +6,12 @@ public class BallHitter : MonoBehaviour
 	public AudioManager audioManager;
 	public Character playerCharacter;
 	public Collider2D hitCollider;
+	public PlayerOwnerShip playerOwnership;
 	float hitterTimer;
 	float currentChargeAmount;
 
 	TurnDirection currentTurnDirection = TurnDirection.Right;
 	Vector2 hitDirection;
-
-	public float maxBounceAngle = 75f;
 
     private void Start()
     {
@@ -115,6 +114,7 @@ public class BallHitter : MonoBehaviour
 			ball.rigidBody.velocity =  hitDirection * (8 * currentChargeAmount);
 			audioManager.PlaySound(AudioManager.SoundID.projectileHit);
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);
+			gameplayManager.SetBallOwnership(playerOwnership);
 		}
 	}
 }

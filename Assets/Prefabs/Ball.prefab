@@ -160,4 +160,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   audioManager: {fileID: 0}
   rigidBody: {fileID: 7710433779117137648}
+  spriteRenderer: {fileID: 7710433779117137651}
   speed: 500

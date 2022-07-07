@@ -6,6 +6,7 @@ public class Brick : MonoBehaviour
 {
     private GameplayManager gameplayManager;
     public SpriteRenderer spriteRenderer;
+    public CameraShake shaker;
 
     public Sprite[] states;
 
@@ -40,6 +41,7 @@ public class Brick : MonoBehaviour
         else
         {
             UpdateBrickColor();
+            shaker.Shake(0.1f, 10);
         }
 
         gameplayManager.Hit((health+1) * points);

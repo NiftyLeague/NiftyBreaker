@@ -14,15 +14,18 @@ public class GameplayManager : MonoBehaviour
 	public Character playerCharacter;
 	[Space]
 	public int level = 1;
-	public int lives = 3;
-	public float player1Multiplier = 1.0f;
-	public float player2Multiplier = 1.0f;
+	public int player1Lives = 4;
+	public int player2Lives = 4;
+	public float multiplier = 1.0f;
+	public PlayerOwnerShip currentPlayerOwnership;
 	[Space]
 	public ObscuredInt score;
 	public ObscuredFloat timePlayed;
 	public ObscuredInt hits;
 	public ObscuredInt xp;
 	[Space]
+	public List<GameObject> player1LifePips;
+	public List<GameObject> player2LifePips;
 	public Ball ball;
 	public List<Brick> bricks;
 	[Space]
@@ -36,8 +39,6 @@ public class GameplayManager : MonoBehaviour
 	public GameObject scoreGainedUIPrefab;
 	public Transform player1Canvas;
 	[Space]
-	public GameObject ballPrefab;
-	public Transform ballStartLocation;
 	public Transform worldLeftLimit;
 	public Transform worldRightLimit;
 
@@ -130,9 +131,9 @@ public class GameplayManager : MonoBehaviour
 	void UpdateScoreText()
 	{
 		string multiplierText = "";
-		if (player1Multiplier > 1.0f)
+		if (multiplier > 1.0f)
 		{
-			multiplierText = "<size=6>x" + player1Multiplier.ToString("0.0");
+			multiplierText = "<size=6>x" + multiplier.ToString("0.0");
 		}
 		scoreText.text = score.ToString("0") + "   " + multiplierText;
 	}
@@ -140,15 +141,58 @@ public class GameplayManager : MonoBehaviour
 	public void LoseBall()
 	{
 		audioManager.PlaySound(AudioManager.SoundID.lose);
+		if (currentPlayerOwnership == PlayerOwnerShip.Player1)
+		{
+			player1Lives--;
+
+			if (player1Lives <= 0)
+			{
+				Lose();
+				return;
+			}
+		}
+		else if (currentPlayerOwnership == PlayerOwnerShip.Player2)
+		{
+			player2Lives--;
+
+			if (player2Lives <= 0)
+			{
+				Lose();
+				return;
+			}
+		}
+		UpdateLives();
 		Reset();
 	}
 
 	private void Reset()
 	{
 		ball.ResetBall();
-		player1Multiplier = 1.0f;
-		player2Multiplier = 1.0f;
+		multiplier = 1.0f;
+		SetBallOwnership(PlayerOwnerShip.None);
 		UpdateScoreText();
+	}
+
+	public void SetBallOwnership(PlayerOwnerShip nextOwnership)
+	{
+		currentPlayerOwnership = nextOwnership;
+		UpdateBallOwnership();
+	}
+
+	private void UpdateBallOwnership()
+	{
+		switch (currentPlayerOwnership)
+		{
+			case PlayerOwnerShip.None:
+				ball.spriteRenderer.color = Color.white;
+				break;
+			case PlayerOwnerShip.Player1:
+				ball.spriteRenderer.color = Color.blue;
+				break;
+			case PlayerOwnerShip.Player2:
+				ball.spriteRenderer.color = Color.red;
+				break;
+		}
 	}
 
 	public void Lose()
@@ -161,6 +205,7 @@ public class GameplayManager : MonoBehaviour
 		cameraShake.Shake(0.5f, 5);
 		IncreaseSpeed(true);
 		playerCharacter.Lose();
+		ball.gameObject.SetActive(false);
 		menuManager.UpdateLeaderboards();
 		//EventController.AddMatchEnd(PlayerSpriteManager.lastDegenIdUsed);
 
@@ -168,6 +213,19 @@ public class GameplayManager : MonoBehaviour
 
 		//Analytics.SendPlayerEvent("EndMatch", new Dictionary<string, string>() { { "Score", score.ToString() } });
 
+	}
+
+	public void UpdateLives()
+	{
+		foreach (GameObject pip in player1LifePips)
+		{
+			pip.SetActive(false);
+		}
+
+		for (int i = 0; i < player1Lives; i++)
+		{
+			player1LifePips[i].SetActive(true);
+		}
 	}
 
 	public void IncreaseSpeed(bool reset = false)
@@ -181,8 +239,8 @@ public class GameplayManager : MonoBehaviour
 
 	public void Hit(int points)
 	{
-		points = (int)(points * player1Multiplier);
-		player1Multiplier += 0.1f;
+		points = (int)(points * multiplier);
+		multiplier += 0.1f;
 		ScorePoints(points);
 
 		if (Cleared())
@@ -198,16 +256,21 @@ public class GameplayManager : MonoBehaviour
 		xp = 0;
 		timePlayed = 0;
 
+		player1Lives = 4;
+		player2Lives = 4;
+		UpdateLives();
+
 		gameOverStatNamesText.text = "";
 		gameOverStatNumbersText.text = "";
 
 		menuManager.ResetLeaderboardDisplay();
+		SetBallOwnership(PlayerOwnerShip.None);
 
 		hasGameEnded = false;
 
 		playerCharacter.UnLose();
 
-		UpdateScoreText();
+		Reset();
 		//Analytics.SendPlayerEvent("StartMatch");
 	}
 
@@ -314,4 +377,11 @@ public class GameplayManager : MonoBehaviour
 
 		return true;
 	}
+}
+
+public enum PlayerOwnerShip
+{
+	None,
+	Player1,
+	Player2,
 }

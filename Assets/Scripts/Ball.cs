@@ -6,18 +6,16 @@ public class Ball : MonoBehaviour
 {
     public AudioManager audioManager;
     public Rigidbody2D rigidBody;
+    public SpriteRenderer spriteRenderer;
 
     public float speed = 500f;
 
-    private void Start()
-    {
-        ResetBall();
-    }
-
     public void ResetBall()
     {
-        this.transform.position = Vector2.down;
-        this.rigidBody.velocity = Vector2.zero;
+        gameObject.SetActive(true);
+
+        transform.position = Vector2.down;
+        rigidBody.velocity = Vector2.zero;
 
         Invoke(nameof(SetRandomTrajectory), 1f);
     }
@@ -28,7 +26,7 @@ public class Ball : MonoBehaviour
         force.x = Random.Range(-1f, 1f);
         force.y = -1f;
 
-        this.rigidBody.AddForce(force.normalized * this.speed);
+        rigidBody.AddForce(force.normalized * speed);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

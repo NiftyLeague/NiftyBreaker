@@ -1610,9 +1610,10 @@ MonoBehaviour:
   audioManager: {fileID: 201607129}
   playerCharacter: {fileID: 1489606863}
   level: 1
-  lives: 3
-  player1Multiplier: 1
-  player2Multiplier: 1
+  player1Lives: 3
+  player2Lives: 3
+  multiplier: 1
+  currentPlayerOwnership: 0
   score:
     currentCryptoKey: 1395131236
     hiddenValue: 1395131236
@@ -1643,6 +1644,12 @@ MonoBehaviour:
     inited: 1
     fakeValue: 0
     fakeValueActive: 0
+  player1LifePips:
+  - {fileID: 515582497}
+  - {fileID: 1956394581}
+  - {fileID: 504806295}
+  - {fileID: 268555951}
+  player2LifePips: []
   ball: {fileID: 6548556901459810200}
   bricks:
   - {fileID: 1582195725}
@@ -1709,8 +1716,6 @@ MonoBehaviour:
   gameOverSkipPrompt: {fileID: 959332937}
   scoreGainedUIPrefab: {fileID: 3812618025407148603, guid: 5a177b12455f5c74bb27d7c4958d2931, type: 3}
   player1Canvas: {fileID: 233645589}
-  ballPrefab: {fileID: 2101283796660733822, guid: 2a5fdb9f419afbe4bb747db40b589ef0, type: 3}
-  ballStartLocation: {fileID: 210668436}
   worldLeftLimit: {fileID: 130979710}
   worldRightLimit: {fileID: 973978082}
   maxBallSpeed:
@@ -2158,7 +2163,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: e914fc8a9f9272f46b6d8ea8f994688e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2589,7 +2594,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 7d1164838ae962e49801b7e4e1c4529f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2922,7 +2927,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: e914fc8a9f9272f46b6d8ea8f994688e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -3969,7 +3974,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 7d1164838ae962e49801b7e4e1c4529f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -4240,7 +4245,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 7d1164838ae962e49801b7e4e1c4529f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -8090,7 +8095,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: e914fc8a9f9272f46b6d8ea8f994688e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -13106,8 +13111,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4294955625
+  m_fontColor: {r: 0.41037738, g: 0.8223056, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -15925,7 +15930,7 @@ MonoBehaviour:
   audioManager: {fileID: 201607129}
   playerCharacter: {fileID: 1489606863}
   hitCollider: {fileID: 1825532305}
-  maxBounceAngle: 75
+  playerOwnership: 1
 --- !u!50 &1825532307
 Rigidbody2D:
   serializedVersion: 4
@@ -17549,7 +17554,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: 7d1164838ae962e49801b7e4e1c4529f, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -17669,7 +17674,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 5
   m_Sprite: {fileID: 21300000, guid: e914fc8a9f9272f46b6d8ea8f994688e, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.4117647, g: 0.8235294, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
