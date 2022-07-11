@@ -79,5 +79,6 @@ public class AudioManager : MonoBehaviour
         insertCoin,
         powerupDrop,
         powerupGet,
+        loseNoOwnership,
     }
 }

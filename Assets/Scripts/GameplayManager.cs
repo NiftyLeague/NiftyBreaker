@@ -29,7 +29,7 @@ public class GameplayManager : MonoBehaviour
 	public List<GameObject> player1LifePips;
 	public List<GameObject> player2LifePips;
 	public Ball ball;
-	public List<Brick> bricks;
+	public List<Transform> stages;
 	public GameObject powerup;
 	[Space]
 	public ObscuredFloat currentSpeedIncrease;
@@ -50,6 +50,8 @@ public class GameplayManager : MonoBehaviour
 	public Vector2 shootRandomTimeoutRange;
 	public ObscuredBool hasGameEnded;
 	public ObscuredFloat powerUpSpawnChance = 0.1f;
+	[Space]
+	public bool godmode;
 
 	Coroutine currentScoreTextCoroutine;
 
@@ -144,28 +146,35 @@ public class GameplayManager : MonoBehaviour
 
 	public void LoseBall()
 	{
-		audioManager.PlaySound(AudioManager.SoundID.lose);
-		if (currentPlayerOwnership == PlayerOwnerShip.Player1)
+		if (currentPlayerOwnership == PlayerOwnerShip.None)
+		{
+			audioManager.PlaySound(AudioManager.SoundID.loseNoOwnership);
+		}
+		else
+		{
+			audioManager.PlaySound(AudioManager.SoundID.lose);
+		}
+
+		if (currentPlayerOwnership == PlayerOwnerShip.Player1 && !godmode)
 		{
 			player1Lives--;
-
+			UpdateLives();
 			if (player1Lives <= 0)
 			{
 				Lose();
 				return;
 			}
 		}
-		else if (currentPlayerOwnership == PlayerOwnerShip.Player2)
+		else if (currentPlayerOwnership == PlayerOwnerShip.Player2 && !godmode)
 		{
 			player2Lives--;
-
+			UpdateLives();
 			if (player2Lives <= 0)
 			{
 				Lose();
 				return;
 			}
 		}
-		UpdateLives();
 		Reset();
 	}
 
@@ -249,7 +258,13 @@ public class GameplayManager : MonoBehaviour
 
 		if (Cleared())
 		{
-			Debug.Log("WON THE STAGE!");
+			level++;
+			if (level > stages.Count)
+			{
+				level = 1;
+			}
+			Reset();
+			SetupNewMap();
 		}
 	}
 
@@ -373,9 +388,9 @@ public class GameplayManager : MonoBehaviour
 
 	private bool Cleared()
 	{
-		for (int i = 0; i < this.bricks.Count; i++)
+		for (int i = 0; i < stages[level-1].childCount; i++)
 		{
-			if (this.bricks[i].gameObject.activeInHierarchy && !this.bricks[i].unbreakable)
+			if (stages[level-1].GetChild(i).gameObject.activeInHierarchy && !stages[level-1].GetChild(i).GetComponent<Brick>().unbreakable)
 			{
 				return false;
 			}
@@ -386,11 +401,18 @@ public class GameplayManager : MonoBehaviour
 
 	private void SetupNewMap()
 	{
-		foreach (Brick brick in bricks)
+		foreach (Transform stage in stages)
+		{
+			stage.gameObject.SetActive(false);
+		}
+
+		stages[level - 1].gameObject.SetActive(true);
+
+		foreach (Transform brick in stages[level-1])
 		{
 			if (Random.value <= powerUpSpawnChance)
 			{
-				brick.AddPowerup();
+				brick.GetComponent<Brick>().AddPowerup();
 			}
 		}
 	}
