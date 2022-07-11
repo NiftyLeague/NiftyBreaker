@@ -77,5 +77,7 @@ public class AudioManager : MonoBehaviour
         explosion,
         projectileChargeHit,
         insertCoin,
+        powerupDrop,
+        powerupGet,
     }
 }

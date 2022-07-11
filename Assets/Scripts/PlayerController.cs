@@ -6,7 +6,6 @@ using TMPro;
 public class PlayerController : MonoBehaviour
 {
 	public GameplayManager gameplayManager;
-	public AudioManager audioManager;
 	[Space]
 	public Transform playerTransform;
 
@@ -32,8 +31,17 @@ public class PlayerController : MonoBehaviour
 			{
 				return;
 			}
-			audioManager.PlaySound(AudioManager.SoundID.menuOptionSelect);
+			gameplayManager.audioManager.PlaySound(AudioManager.SoundID.menuOptionSelect);
 			PlayerSpriteManager.I.ChangeCharacter();
+		}
+	}
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+		if (collision.CompareTag("Powerup"))
+		{
+			gameplayManager.audioManager.PlaySound(AudioManager.SoundID.powerupGet);
+			collision.GetComponent<Powerup>().CollectPowerup();
 		}
 	}
 }

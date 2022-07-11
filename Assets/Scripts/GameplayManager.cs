@@ -18,6 +18,8 @@ public class GameplayManager : MonoBehaviour
 	public int player2Lives = 4;
 	public float multiplier = 1.0f;
 	public PlayerOwnerShip currentPlayerOwnership;
+	public Color32 player1OwnershipColor;
+	public Color32 player2OwnershipColor;
 	[Space]
 	public ObscuredInt score;
 	public ObscuredFloat timePlayed;
@@ -28,6 +30,7 @@ public class GameplayManager : MonoBehaviour
 	public List<GameObject> player2LifePips;
 	public Ball ball;
 	public List<Brick> bricks;
+	public GameObject powerup;
 	[Space]
 	public ObscuredFloat currentSpeedIncrease;
 	public CameraShake cameraShake;
@@ -46,6 +49,7 @@ public class GameplayManager : MonoBehaviour
 	public Vector2 startTimeoutRange;
 	public Vector2 shootRandomTimeoutRange;
 	public ObscuredBool hasGameEnded;
+	public ObscuredFloat powerUpSpawnChance = 0.1f;
 
 	Coroutine currentScoreTextCoroutine;
 
@@ -187,10 +191,10 @@ public class GameplayManager : MonoBehaviour
 				ball.spriteRenderer.color = Color.white;
 				break;
 			case PlayerOwnerShip.Player1:
-				ball.spriteRenderer.color = Color.blue;
+				ball.spriteRenderer.color = player1OwnershipColor;
 				break;
 			case PlayerOwnerShip.Player2:
-				ball.spriteRenderer.color = Color.red;
+				ball.spriteRenderer.color = player2OwnershipColor;
 				break;
 		}
 	}
@@ -269,6 +273,8 @@ public class GameplayManager : MonoBehaviour
 		hasGameEnded = false;
 
 		playerCharacter.UnLose();
+
+		SetupNewMap();
 
 		Reset();
 		//Analytics.SendPlayerEvent("StartMatch");
@@ -376,6 +382,17 @@ public class GameplayManager : MonoBehaviour
 		}
 
 		return true;
+	}
+
+	private void SetupNewMap()
+	{
+		foreach (Brick brick in bricks)
+		{
+			if (Random.value <= powerUpSpawnChance)
+			{
+				brick.AddPowerup();
+			}
+		}
 	}
 }
 

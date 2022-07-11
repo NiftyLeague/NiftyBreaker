@@ -1519,7 +1519,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameplayManager: {fileID: 203195491}
-  audioManager: {fileID: 201607129}
   playerTransform: {fileID: 1489606864}
 --- !u!61 &192207256
 BoxCollider2D:
@@ -1528,13 +1527,13 @@ BoxCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 192207253}
-  m_Enabled: 0
+  m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: -0.4, y: -1}
+  m_Offset: {x: 0, y: -1}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -1545,7 +1544,7 @@ BoxCollider2D:
     adaptiveTiling: 0
   m_AutoTiling: 0
   serializedVersion: 2
-  m_Size: {x: 0.6, y: 2}
+  m_Size: {x: 1, y: 2.5}
   m_EdgeRadius: 0
 --- !u!4 &201607128 stripped
 Transform:
@@ -1614,6 +1613,12 @@ MonoBehaviour:
   player2Lives: 3
   multiplier: 1
   currentPlayerOwnership: 0
+  player1OwnershipColor:
+    serializedVersion: 2
+    rgba: 4294955625
+  player2OwnershipColor:
+    serializedVersion: 2
+    rgba: 4278227711
   score:
     currentCryptoKey: 1395131236
     hiddenValue: 1395131236
@@ -1697,6 +1702,7 @@ MonoBehaviour:
   - {fileID: 365315573}
   - {fileID: 2021815043}
   - {fileID: 1288088500}
+  powerup: {fileID: 6510492326339341095, guid: 70edcb90439c8b34a9f2543672e19fcf, type: 3}
   currentSpeedIncrease:
     migratedVersion: 
     currentCryptoKey: 1393871567
@@ -1738,6 +1744,18 @@ MonoBehaviour:
     inited: 1
     fakeValue: 0
     fakeValueActive: 0
+  powerUpSpawnChance:
+    migratedVersion: 
+    currentCryptoKey: 1648228951
+    hiddenValue: 1597436314
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    inited: 1
+    fakeValue: 0.1
+    fakeValueActive: 1
 --- !u!1 &210668435
 GameObject:
   m_ObjectHideFlags: 0

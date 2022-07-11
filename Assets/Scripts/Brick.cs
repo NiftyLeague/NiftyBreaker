@@ -7,6 +7,7 @@ public class Brick : MonoBehaviour
     private GameplayManager gameplayManager;
     public SpriteRenderer spriteRenderer;
     public CameraShake shaker;
+    public GameObject powerUpOverlay;
 
     public Sprite[] states;
 
@@ -14,6 +15,7 @@ public class Brick : MonoBehaviour
     public int points = 10;
 
     public bool unbreakable;
+    bool hasPowerup;
 
     private void Start()
     {
@@ -37,6 +39,12 @@ public class Brick : MonoBehaviour
         if (this.health <= 0)
         {
             this.gameObject.SetActive(false);
+
+            if (hasPowerup)
+            {
+                gameplayManager.audioManager.PlaySound(AudioManager.SoundID.powerupDrop);
+                Instantiate(gameplayManager.powerup, transform.position, transform.rotation);
+            }
         }
         else
         {
@@ -50,6 +58,13 @@ public class Brick : MonoBehaviour
     private void UpdateBrickColor()
     {
         this.spriteRenderer.sprite = this.states[this.health - 1];
+
+        powerUpOverlay.SetActive(hasPowerup ? true : false);
+    }
+
+    public void AddPowerup()
+    {
+        hasPowerup = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
