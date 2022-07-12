@@ -148,18 +148,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreGainedText: {fileID: 3812618025407148600}
-  randomScoreGainedColors:
+  randomPlayer1Colors:
   - serializedVersion: 2
-    rgba: 4278190335
+    rgba: 4294951424
   - serializedVersion: 2
-    rgba: 4280549120
+    rgba: 4294930688
   - serializedVersion: 2
-    rgba: 4294937344
+    rgba: 4294939648
+  randomPlayer2Colors:
   - serializedVersion: 2
-    rgba: 4294901937
+    rgba: 4278227967
   - serializedVersion: 2
-    rgba: 4294967295
+    rgba: 4278236159
   - serializedVersion: 2
-    rgba: 4278251263
-  - serializedVersion: 2
-    rgba: 4278251263
+    rgba: 4278213375

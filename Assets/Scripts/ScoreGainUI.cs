@@ -6,13 +6,35 @@ using TMPro;
 public class ScoreGainUI : MonoBehaviour
 {
     public TextMeshProUGUI scoreGainedText;
-	public List<Color32> randomScoreGainedColors;
+    public List<Color32> randomPlayer1Colors;
+    public List<Color32> randomPlayer2Colors;
 
-	public void Initialize(int scoreGainedAmount)
+    private PlayerOwnerShip playerOwnership;
+    private float colorTimer;
+
+    private void Update()
+    {
+        colorTimer += Time.deltaTime;
+        if (colorTimer >= 0.1f)
+        {
+            if (playerOwnership == PlayerOwnerShip.Player1)
+            {
+                scoreGainedText.color = randomPlayer1Colors[Random.Range(0, randomPlayer1Colors.Count)];
+            }
+            else
+            {
+                scoreGainedText.color = randomPlayer2Colors[Random.Range(0, randomPlayer2Colors.Count)];
+            }
+
+            colorTimer = 0;
+        }
+    }
+
+    public void Initialize(int scoreGainedAmount, PlayerOwnerShip playerOwnership)
     {
         transform.localPosition = new Vector2(Random.Range(-1.5f, 1.5f), -7 + Random.Range(-1.5f, 1.5f));
         scoreGainedText.text = "+" + scoreGainedAmount.ToString("0");
-
+        this.playerOwnership = playerOwnership;
 		StartCoroutine(AnimateScoreGained());
     }
 
@@ -29,16 +51,8 @@ public class ScoreGainUI : MonoBehaviour
 			scoreGainedText.transform.localScale = new Vector3(0.1f, scalePointMessageTween.Update(Time.deltaTime), 0.1f);
 		}
 
-		float timeBetweenRandomColors = 0.1f;
-		int repeatTimes = 10;
+		yield return new WaitForSeconds(1.0f);
 
-		while (repeatTimes > 0)
-		{
-			yield return new WaitForSeconds(timeBetweenRandomColors);
-			scoreGainedText.color = randomScoreGainedColors[Random.Range(0, randomScoreGainedColors.Count)];
-			repeatTimes--;
-		}
-
-		Destroy(gameObject);
+        Destroy(gameObject);
 	}
 }

@@ -44,11 +44,11 @@ public class BallHitter : MonoBehaviour
 		switch (currentTurnDirection)
 		{
 			case TurnDirection.Left:
-				attackDirectionX = -1.2f;
+				attackDirectionX = -1f;
 				hitDirectionX = -0.5f;
 				break;
 			case TurnDirection.Right:
-				attackDirectionX = 1.2f;
+				attackDirectionX = 1f;
 				hitDirectionX = 0.5f;
 				break;
 		}

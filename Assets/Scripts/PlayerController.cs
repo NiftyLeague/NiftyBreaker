@@ -6,6 +6,7 @@ using TMPro;
 public class PlayerController : MonoBehaviour
 {
 	public GameplayManager gameplayManager;
+	public int player = 1;
 	[Space]
 	public Transform playerTransform;
 
@@ -13,7 +14,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
-		PlayerSpriteManager.I.SetCharacterSprites();
+		PlayerSpriteManager.I.SetCharacterSprites(player);
 	}
 
 	void FixedUpdate()
@@ -32,7 +33,7 @@ public class PlayerController : MonoBehaviour
 				return;
 			}
 			gameplayManager.audioManager.PlaySound(AudioManager.SoundID.menuOptionSelect);
-			PlayerSpriteManager.I.ChangeCharacter();
+			PlayerSpriteManager.I.ChangeCharacter(player);
 		}
 	}
 

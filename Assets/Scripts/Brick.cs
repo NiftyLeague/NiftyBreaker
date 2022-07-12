@@ -35,7 +35,7 @@ public class Brick : MonoBehaviour
         }
 
         this.health--;
-        if (gameplayManager.godmode)
+        if (gameplayManager.godMode)
         {
             health = 0;
         }
