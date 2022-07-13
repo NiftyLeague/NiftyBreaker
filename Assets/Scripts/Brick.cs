@@ -46,7 +46,7 @@ public class Brick : MonoBehaviour
 
             if (hasPowerup)
             {
-                gameplayManager.audioManager.PlaySound(AudioManager.SoundID.powerupDrop);
+                gameplayManager.audioManager.PlaySound("PowerupSpawn");
                 Instantiate(gameplayManager.powerup, transform.position, transform.rotation);
             }
         }

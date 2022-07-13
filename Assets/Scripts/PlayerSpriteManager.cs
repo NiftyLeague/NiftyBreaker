@@ -13,6 +13,7 @@ public class PlayerSpriteManager : MonoBehaviour
 	private static List<CharacterSprites> importedCharacterSprites;
 	private static List<bool> hasImportedCharacterSpriteBeenDownloaded;
 	public List<CharacterSprites> demoCharacterSprites;
+	private CharacterAnimator characterAnimator;
 
 	public TextMeshProUGUI loadingDegensText;
 	public Image loadingDegensProgressBar;
@@ -56,8 +57,7 @@ public class PlayerSpriteManager : MonoBehaviour
 		Scene scene = SceneManager.GetActiveScene();
 		if (scene.buildIndex == 1)
 		{
-			ChangeCharacter(1);
-			ChangeCharacter(2);
+			ChangeCharacter();
 		}
 	}
 
@@ -135,8 +135,7 @@ public class PlayerSpriteManager : MonoBehaviour
 		{
 			currentCharacterSprites = importedCharacterSprites.Count - 1;
 
-			SetCharacterSprites(1);
-			SetCharacterSprites(2);
+			SetCharacterSprites();
 		}
 	}
 
@@ -157,7 +156,7 @@ public class PlayerSpriteManager : MonoBehaviour
 		hasBeenInitializedAlready = true;
 	}
 
-	public void ChangeCharacter(int player)
+	public void ChangeCharacter()
 	{
 		if (canChangeCharacters)
 		{
@@ -175,7 +174,7 @@ public class PlayerSpriteManager : MonoBehaviour
 
 			if (hasImportedCharacterSpriteBeenDownloaded[currentCharacterSprites])
 			{
-				SetCharacterSprites(player);
+				SetCharacterSprites();
 			}
 			else
 			{
@@ -186,7 +185,7 @@ public class PlayerSpriteManager : MonoBehaviour
 		else
 		{
 			currentCharacterSprites = UnityEngine.Random.Range(0, 6);
-			SetCharacterSprites(player);
+			SetCharacterSprites();
 		}
 	}
 
@@ -207,9 +206,12 @@ public class PlayerSpriteManager : MonoBehaviour
 		return canChangeCharacters;
 	}
 
-	public void SetCharacterSprites(int playerID)
+	public void SetCharacterSprites()
 	{
-		CharacterAnimator characterAnimator = GameObject.Find("Player " + playerID).GetComponent<CharacterAnimator>();
+		if (characterAnimator == null)
+		{
+			characterAnimator = FindObjectOfType<CharacterAnimator>();
+		}
 
 		List<Sprite> spritesToUse = new List<Sprite>();
 

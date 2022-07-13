@@ -445,11 +445,11 @@ public class Character : MonoBehaviour
         {
             attackState = AttackState.Attacking;
             //SoundController.PlaySoundEffect("BatSwing", 0.4f + attackChargeM * 0.4f, transform.position);
-            audioManager.PlaySound(AudioManager.SoundID.batSwing, 0.4f + attackChargeM * 0.4f);
+            audioManager.PlaySound("BatSwing", 0.4f + attackChargeM * 0.4f);
             if (attackChargeM > 0.25f || IngestedFly)
             {
                 //SoundController.PlaySoundEffect("BatSwingVoice", 0.4f, transform.position);
-                audioManager.PlaySound(AudioManager.SoundID.playerBatSwingVoice, 0.4f);
+                audioManager.PlaySound("BatSwingVoice", 0.4f);
             }
             attackTimeLeft = attackTime;
             if (attackChargeM > 0.5f)
@@ -742,14 +742,14 @@ public class Character : MonoBehaviour
         if (OnGround && !wasOnGround)
         {
             //SoundController.PlaySoundEffect("Land", 0.4f, transform.position);
-            audioManager.PlaySound(AudioManager.SoundID.playerLand);
+            audioManager.PlaySound("PlayerLand");
             jumpCooldownLeft = 0.1f;
 
         }
         if (WallSliding && !wasWallSlide)
         {
             //SoundController.PlaySoundEffect("Land", 0.4f, transform.position);
-            audioManager.PlaySound(AudioManager.SoundID.playerLand);
+            audioManager.PlaySound("PlayerLand");
             jumpCooldownLeft = 0.1f;
         }
 
@@ -1231,7 +1231,7 @@ public class Character : MonoBehaviour
                 {
                     attackState = AttackState.Charging;
                     //SoundController.PlaySoundEffect("BatChargeUp", 0.5f, transform.position);
-                    audioManager.PlaySound(AudioManager.SoundID.batCharge);
+                    audioManager.PlaySound("BatCharge");
                     attackChargeCounter = 0f;
                 }
             }

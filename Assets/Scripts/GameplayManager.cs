@@ -11,27 +11,21 @@ public class GameplayManager : MonoBehaviour
 
 	public MenuManager menuManager;
 	public AudioManager audioManager;
-	public Character player1Character;
-	public Character player2Character;
+	public Character playerCharacter;
 	[Space]
-	public int level = 1;
-	public int player1Lives = 4;
-	public int player2Lives = 4;
+	public int currentlevel = 1;
+	public int totalLevel = 1;
+	public int lives = 4;
 	public float multiplier = 1.0f;
 	public PlayerOwnerShip currentPlayerOwnership;
-	public Color32 player1OwnershipColor;
-	public Color32 player2OwnershipColor;
+	public Color32 playerOwnershipColor;
 	[Space]
 	public ObscuredFloat timePlayed;
-	public ObscuredInt player1Score;
-	public ObscuredInt player2Score;
-	public ObscuredInt player1Hits;
-	public ObscuredInt player2Hits;
-	public ObscuredInt player1Xp;
-	public ObscuredInt player2Xp;
+	public ObscuredInt score;
+	public ObscuredInt hits;
+	public ObscuredInt xp;
 	[Space]
-	public List<GameObject> player1LifePips;
-	public List<GameObject> player2LifePips;
+	public List<GameObject> playerLifePips;
 	public Ball ball;
 	public List<Transform> stages;
 	public GameObject powerup;
@@ -40,17 +34,15 @@ public class GameplayManager : MonoBehaviour
 	public CameraShake cameraShake;
 	[Space]
 	public TextMeshProUGUI endOfGameStatsText;
-	public TextMeshProUGUI player1NameText;
-	public TextMeshProUGUI player2NameText;
-	public TextMeshProUGUI player1ScoreText;
-	public TextMeshProUGUI player2ScoreText;
+	public TextMeshProUGUI playerNameText;
+	public TextMeshProUGUI playerScoreText;
+	public TextMeshProUGUI levelText;
 	public TextMeshProUGUI gameOverStatNamesText;
 	public TextMeshProUGUI gameOverStatNumbersText;
 	public GameObject gameOverBackground;
 	public GameObject gameOverSkipPrompt;
 	public GameObject scoreGainedUIPrefab;
-	public Transform player1Canvas;
-	public Transform player2Canvas;
+	public Transform playerCanvas;
 	[Space]
 	public Transform worldLeftLimit;
 	public Transform worldRightLimit;
@@ -61,7 +53,6 @@ public class GameplayManager : MonoBehaviour
 	public ObscuredBool hasGameEnded;
 	public ObscuredFloat powerUpSpawnChance = 0.1f;
 	[Space]
-	public bool multiplayerMode;
 	public bool godMode;
 
 	Coroutine currentScoreTextCoroutine;
@@ -78,10 +69,6 @@ public class GameplayManager : MonoBehaviour
 
 	void Start()
 	{
-		player2Character.gameObject.SetActive(multiplayerMode);
-		player2ScoreText.gameObject.SetActive(multiplayerMode);
-		player2NameText.gameObject.SetActive(multiplayerMode);
-
 		UpdateScoreTexts();
 		ResetEverythingForANewGame();
 		menuManager.menuPanel.SetActive(false);
@@ -98,13 +85,13 @@ public class GameplayManager : MonoBehaviour
 				if (gameOverTimer1 > 0)
 				{
 					gameOverTimer1 = 0;
-					audioManager.PlaySound(AudioManager.SoundID.menuOptionSelect);
+					audioManager.PlaySound("MenuOptionSelect");
 					return;
 				}
 				else if (gameOverTimer2 > 0)
 				{
 					gameOverTimer2 = 0;
-					audioManager.PlaySound(AudioManager.SoundID.menuOptionSelect);
+					audioManager.PlaySound("MenuOptionSelect");
 					return;
 				}
 			}
@@ -144,29 +131,16 @@ public class GameplayManager : MonoBehaviour
 			StopCoroutine(currentScoreTextCoroutine);
 		}
 
-		switch (currentPlayerOwnership)
-		{
-			case PlayerOwnerShip.Player1:
-				player1Score += scoreGainedAmount;
-				player1Hits++;
+		score += scoreGainedAmount;
+		hits++;
 
-				var newScoreGainedUIPlayer1 = Instantiate(scoreGainedUIPrefab, player1Canvas);
-				newScoreGainedUIPlayer1.GetComponent<ScoreGainUI>().Initialize(scoreGainedAmount, PlayerOwnerShip.Player1);
-				currentScoreTextCoroutine = StartCoroutine(AnimatePlayer1ScoreText());
-				break;
-			case PlayerOwnerShip.Player2:
-				player2Score += scoreGainedAmount;
-				player2Hits++;
-
-				var newScoreGainedUIPlayer2 = Instantiate(scoreGainedUIPrefab, player2Canvas);
-				newScoreGainedUIPlayer2.GetComponent<ScoreGainUI>().Initialize(scoreGainedAmount, PlayerOwnerShip.Player2);
-				currentScoreTextCoroutine = StartCoroutine(AnimatePlayer2ScoreText());
-				break;
-		}
+		var newScoreGainedUIPlayer1 = Instantiate(scoreGainedUIPrefab, playerCanvas);
+		newScoreGainedUIPlayer1.GetComponent<ScoreGainUI>().Initialize(scoreGainedAmount, PlayerOwnerShip.Player1);
+		currentScoreTextCoroutine = StartCoroutine(AnimateScoreText());
 
 		IncreaseSpeed();
 		UpdateScoreTexts();
-		audioManager.PlaySound(AudioManager.SoundID.gainPoint);
+		audioManager.PlaySound("GainPoint");
 		//EventController.AddScore(scoreGainedAmount);
 	}
 
@@ -178,51 +152,31 @@ public class GameplayManager : MonoBehaviour
 			multiplierText = "   <size=6>x" + multiplier.ToString("0.0");
 		}
 
-		player1ScoreText.text = player1Score.ToString("0");
-		player2ScoreText.text = player2Score.ToString("0");
-
-		switch (currentPlayerOwnership)
-		{
-			case PlayerOwnerShip.Player1:
-				player1ScoreText.text += multiplierText;
-				break;
-			case PlayerOwnerShip.Player2:
-				player2ScoreText.text += multiplierText;
-				break;
-		}
+		playerScoreText.text = score.ToString("0") + multiplierText;
 	}
 
 	public void LoseBall()
 	{
 		if (currentPlayerOwnership == PlayerOwnerShip.None)
 		{
-			audioManager.PlaySound(AudioManager.SoundID.loseNoOwnership);
+			audioManager.PlaySound("LoseNoOwnership");
 		}
 		else
 		{
-			audioManager.PlaySound(AudioManager.SoundID.lose);
+			audioManager.PlaySound("Lose");
 		}
 
 		if (currentPlayerOwnership == PlayerOwnerShip.Player1 && !godMode)
 		{
-			player1Lives--;
+			lives--;
 			UpdateLives();
-			if (player1Lives <= 0)
+			if (lives <= 0)
 			{
 				Lose();
 				return;
 			}
 		}
-		else if (currentPlayerOwnership == PlayerOwnerShip.Player2 && !godMode)
-		{
-			player2Lives--;
-			UpdateLives();
-			if (player2Lives <= 0)
-			{
-				Lose();
-				return;
-			}
-		}
+	
 		Reset();
 	}
 
@@ -248,10 +202,7 @@ public class GameplayManager : MonoBehaviour
 				ball.spriteRenderer.color = Color.white;
 				break;
 			case PlayerOwnerShip.Player1:
-				ball.spriteRenderer.color = player1OwnershipColor;
-				break;
-			case PlayerOwnerShip.Player2:
-				ball.spriteRenderer.color = player2OwnershipColor;
+				ball.spriteRenderer.color = playerOwnershipColor;
 				break;
 		}
 	}
@@ -265,7 +216,7 @@ public class GameplayManager : MonoBehaviour
 		hasGameEnded = true;
 		cameraShake.Shake(0.5f, 5);
 		IncreaseSpeed(true);
-		player1Character.Lose();
+		playerCharacter.Lose();
 		ball.gameObject.SetActive(false);
 		menuManager.UpdateLeaderboards();
 		//EventController.AddMatchEnd(PlayerSpriteManager.lastDegenIdUsed);
@@ -278,24 +229,14 @@ public class GameplayManager : MonoBehaviour
 
 	public void UpdateLives()
 	{
-		foreach (GameObject pip in player1LifePips)
+		foreach (GameObject pip in playerLifePips)
 		{
 			pip.SetActive(false);
 		}
 
-		foreach (GameObject pip in player2LifePips)
+		for (int i = 0; i < lives; i++)
 		{
-			pip.SetActive(false);
-		}
-
-		for (int i = 0; i < player1Lives; i++)
-		{
-			player1LifePips[i].SetActive(true);
-		}
-
-		for (int i = 0; i < player2Lives; i++)
-		{
-			player2LifePips[i].SetActive(true);
+			playerLifePips[i].SetActive(true);
 		}
 	}
 
@@ -316,10 +257,11 @@ public class GameplayManager : MonoBehaviour
 
 		if (Cleared())
 		{
-			level++;
-			if (level > stages.Count)
+			currentlevel++;
+			totalLevel++;
+			if (currentlevel > stages.Count)
 			{
-				level = 1;
+				currentlevel = 1;
 			}
 			Reset();
 			SetupNewMap();
@@ -328,16 +270,12 @@ public class GameplayManager : MonoBehaviour
 
 	public void ResetEverythingForANewGame()
 	{
-		player1Hits = 0;
-		player1Score = 0;
-		player1Xp = 0;
-		player2Hits = 0;
-		player2Score = 0;
-		player2Xp = 0;
+		hits = 0;
+		score = 0;
+		xp = 0;
 		timePlayed = 0;
 
-		player1Lives = 4;
-		player2Lives = 4;
+		lives = 4;
 		UpdateLives();
 
 		gameOverStatNamesText.text = "";
@@ -348,8 +286,7 @@ public class GameplayManager : MonoBehaviour
 
 		hasGameEnded = false;
 
-		player1Character.UnLose();
-		player2Character.UnLose();
+		playerCharacter.UnLose();
 
 		gameOverBackground.SetActive(false);
 
@@ -361,7 +298,7 @@ public class GameplayManager : MonoBehaviour
 
 	IEnumerator PlayGameOverScreen()
 	{
-		audioManager.PlaySound(AudioManager.SoundID.lose);
+		audioManager.PlaySound("Lose");
 		gameOverBackground.SetActive(true);
 		endOfGameStatsText.text = "GAME OVER";
 
@@ -373,8 +310,7 @@ public class GameplayManager : MonoBehaviour
 		yield return new WaitUntil(() => gameOverTimer1 <= 0);
 		//yield return GetMatchResults();
 
-		player1Character.StandBackUp();
-		player2Character.StandBackUp();
+		playerCharacter.StandBackUp();
 
 		endOfGameStatsText.text = "";
 
@@ -383,14 +319,7 @@ public class GameplayManager : MonoBehaviour
 		float hoursPlayed = timePlayed / 60 / 60;
 
 		string statNames = "TIME PLAYED\n\nSCORE\nHITS\nXP";
-		string statValues = hoursPlayed.ToString("0") + ":" + minutesPlayed.ToString("00") + ":" + secondsPlayed.ToString("00") + "\n\n" + player1Score.ToString("0") + "\n" + player1Hits.ToString("0") + "\n+" + player1Xp.ToString("0");
-
-		if (multiplayerMode)
-		{
-			statNames = "TIME PLAYED\n\nPLAYER 1 SCORE\nPLAYER 1 HITS\nPLAYER 1 XP\n\nPLAYER 2 SCORE\nPLAYER 2 HITS\nPLAYER 2 XP";
-			statValues = hoursPlayed.ToString("0") + ":" + minutesPlayed.ToString("00") + ":" + secondsPlayed.ToString("00") + "\n\n" + player1Score.ToString("0") + "\n" + player1Hits.ToString("0") + "\n+" + player1Xp.ToString("0");
-            statValues += "\n\n" + player2Score.ToString("0") + "\n" + player2Hits.ToString("0") + "\n+" + player2Xp.ToString("0");
-		}
+		string statValues = hoursPlayed.ToString("0") + ":" + minutesPlayed.ToString("00") + ":" + secondsPlayed.ToString("00") + "\n\n" + score.ToString("0") + "\n" + hits.ToString("0") + "\n+" + xp.ToString("0");
 
 		gameOverStatNamesText.text = statNames.ToUpper();
 		gameOverStatNumbersText.text = statValues.ToUpper();
@@ -437,7 +366,7 @@ public class GameplayManager : MonoBehaviour
 		}
 	}
 
-	IEnumerator AnimatePlayer1ScoreText()
+	IEnumerator AnimateScoreText()
 	{
 		float a = 0.09f;
 		float b = 0.1f;
@@ -447,29 +376,15 @@ public class GameplayManager : MonoBehaviour
 		while (!scaleTween.IsEnded())
 		{
 			yield return new WaitForEndOfFrame();
-			player1ScoreText.transform.localScale = new Vector3(0.1f, scaleTween.Update(Time.deltaTime), 0.1f);
-		}
-	}
-
-	IEnumerator AnimatePlayer2ScoreText()
-	{
-		float a = 0.09f;
-		float b = 0.1f;
-
-		Tween<float> scaleTween = new Tween<float>(a, b, 0.2f, TweenEaseType.CubicIn);
-
-		while (!scaleTween.IsEnded())
-		{
-			yield return new WaitForEndOfFrame();
-			player2ScoreText.transform.localScale = new Vector3(0.1f, scaleTween.Update(Time.deltaTime), 0.1f);
+			playerScoreText.transform.localScale = new Vector3(0.1f, scaleTween.Update(Time.deltaTime), 0.1f);
 		}
 	}
 
 	private bool Cleared()
 	{
-		for (int i = 0; i < stages[level-1].childCount; i++)
+		for (int i = 0; i < stages[currentlevel - 1].childCount; i++)
 		{
-			if (stages[level-1].GetChild(i).gameObject.activeInHierarchy && !stages[level-1].GetChild(i).GetComponent<Brick>().unbreakable)
+			if (stages[currentlevel - 1].GetChild(i).gameObject.activeInHierarchy && !stages[currentlevel - 1].GetChild(i).GetComponent<Brick>().unbreakable)
 			{
 				return false;
 			}
@@ -485,15 +400,17 @@ public class GameplayManager : MonoBehaviour
 			stage.gameObject.SetActive(false);
 		}
 
-		stages[level - 1].gameObject.SetActive(true);
+		stages[currentlevel - 1].gameObject.SetActive(true);
 
-		foreach (Transform brick in stages[level-1])
+		foreach (Transform brick in stages[currentlevel -1])
 		{
 			if (Random.value <= powerUpSpawnChance)
 			{
 				brick.GetComponent<Brick>().AddPowerup();
 			}
 		}
+
+		levelText.text = "LEVEL\n<size=10>" + totalLevel.ToString("0");
 	}
 }
 

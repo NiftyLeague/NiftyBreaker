@@ -14,7 +14,7 @@ public class PlayerController : MonoBehaviour
 
 	private void Start()
 	{
-		PlayerSpriteManager.I.SetCharacterSprites(player);
+		PlayerSpriteManager.I.SetCharacterSprites();
 	}
 
 	void FixedUpdate()
@@ -32,8 +32,8 @@ public class PlayerController : MonoBehaviour
 			{
 				return;
 			}
-			gameplayManager.audioManager.PlaySound(AudioManager.SoundID.menuOptionSelect);
-			PlayerSpriteManager.I.ChangeCharacter(player);
+			gameplayManager.audioManager.PlaySound("MenuOptionSelect");
+			PlayerSpriteManager.I.ChangeCharacter();
 		}
 	}
 
@@ -41,7 +41,7 @@ public class PlayerController : MonoBehaviour
 	{
 		if (collision.CompareTag("Powerup"))
 		{
-			gameplayManager.audioManager.PlaySound(AudioManager.SoundID.powerupGet);
+			gameplayManager.audioManager.PlaySound("PowerupGet");
 			collision.GetComponent<Powerup>().CollectPowerup();
 		}
 	}

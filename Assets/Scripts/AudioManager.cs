@@ -7,7 +7,7 @@ public class AudioManager : MonoBehaviour
 {
     public List<AudioSource> soundEffectAudioSources;
     public List<Sound> soundList;
-    private Dictionary<SoundID, Sound> soundDictionary;
+    private Dictionary<string, Sound> soundDictionary;
     private bool hasInitializedSoundDictionary;
     private int lastAudioSourceUsed;
 
@@ -23,7 +23,7 @@ public class AudioManager : MonoBehaviour
             return;
         }
             
-        soundDictionary = new Dictionary<SoundID, Sound>();
+        soundDictionary = new Dictionary<string, Sound>();
             
         foreach (Sound sound in soundList)   
         {
@@ -33,7 +33,7 @@ public class AudioManager : MonoBehaviour
         hasInitializedSoundDictionary = true;
     }
 
-    public void PlaySound(SoundID soundID, float volume = 1f)
+    public void PlaySound(string soundID, float volume = 1f)
     {
         List<AudioSource> audioSourcesInSound = new List<AudioSource>();
         audioSourcesInSound = soundDictionary[soundID].audioSources;
@@ -55,30 +55,6 @@ public class AudioManager : MonoBehaviour
     public class Sound
     {
         public List<AudioSource> audioSources;
-        public SoundID soundID;
-    }
-
-    public enum SoundID
-    {
-        None,
-        messagePopup,
-        projectileShoot,
-        projectileHit,
-        gainPoint,
-        lose,
-        batSwing,
-        playerLand,
-        menuOptionSelect,
-        playerJump,
-        batCharge,
-        ballBounce,
-        playerBatSwingVoice,
-        ballMachineHit,
-        explosion,
-        projectileChargeHit,
-        insertCoin,
-        powerupDrop,
-        powerupGet,
-        loseNoOwnership,
+        public string soundID;
     }
 }

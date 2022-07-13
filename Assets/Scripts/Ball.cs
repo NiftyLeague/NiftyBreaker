@@ -31,7 +31,7 @@ public class Ball : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        audioManager.PlaySound(AudioManager.SoundID.ballBounce);
+        audioManager.PlaySound("BallBounce");
         rigidBody.velocity = rigidBody.velocity * 1.02f;
         EffectsController.CreateHitEffect(transform.position, 0.1f, false);
     }

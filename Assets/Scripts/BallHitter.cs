@@ -78,7 +78,7 @@ public class BallHitter : MonoBehaviour
 		hitDirection = new Vector2(hitDirectionX, hitDirectionY);
 		hitterTimer = 0;
 		gameObject.SetActive(true);
-		audioManager.PlaySound(AudioManager.SoundID.batSwing);
+		audioManager.PlaySound("BatSwing");
 	}
 
 	void TurnOff()
@@ -112,7 +112,7 @@ public class BallHitter : MonoBehaviour
 		if (ball != null)
 		{
 			ball.rigidBody.velocity =  hitDirection * (8 * currentChargeAmount);
-			audioManager.PlaySound(AudioManager.SoundID.projectileHit);
+			audioManager.PlaySound("ProjectileHit");
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);
 			gameplayManager.SetBallOwnership(playerOwnership);
 		}
