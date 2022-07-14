@@ -188,6 +188,13 @@ public class GameplayManager : MonoBehaviour
 		UpdateScoreTexts();
 	}
 
+	public void Explosion(Vector3 position)
+	{
+		EffectsController.CreateExplosion(position);
+		audioManager.PlaySound("Explosion", 0.25f);
+		cameraShake.Shake(0.2f, 5);
+	}
+
 	public void SetBallOwnership(PlayerOwnerShip nextOwnership)
 	{
 		currentPlayerOwnership = nextOwnership;
@@ -225,6 +232,13 @@ public class GameplayManager : MonoBehaviour
 
 		//Analytics.SendPlayerEvent("EndMatch", new Dictionary<string, string>() { { "Score", score.ToString() } });
 
+	}
+
+	public void GainLife()
+	{
+		lives++;
+		lives = Mathf.Clamp(lives, 0, 4);
+		UpdateLives();
 	}
 
 	public void UpdateLives()

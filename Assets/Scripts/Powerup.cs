@@ -7,6 +7,7 @@ public class Powerup : MonoBehaviour
     public Rigidbody2D rigidBody;
     public SpriteRenderer spriteRenderer;
     public float speed = 5;
+    public PowerUpType powerUpType;
 
     float currentColor;
 
@@ -24,6 +25,21 @@ public class Powerup : MonoBehaviour
 
     public void CollectPowerup()
     {
+        switch (powerUpType)
+        {
+            case PowerUpType.LifeUp:
+                GameplayManager.I.GainLife();
+                break;
+        }
         Destroy(gameObject);
     }
+}
+
+public enum PowerUpType
+{
+    LifeUp,
+    Slow,
+    SpikedBall,
+    Multiball,
+    Clone,
 }

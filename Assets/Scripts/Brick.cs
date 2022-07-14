@@ -8,6 +8,7 @@ public class Brick : MonoBehaviour
     public SpriteRenderer spriteRenderer;
     public CameraShake shaker;
     public GameObject powerUpOverlay;
+    public GameObject bombOverlay;
 
     public Sprite[] states;
 
@@ -15,6 +16,7 @@ public class Brick : MonoBehaviour
     public int points = 10;
 
     public bool unbreakable;
+    public bool bomb;
     bool hasPowerup;
 
     private void Start()
@@ -27,14 +29,14 @@ public class Brick : MonoBehaviour
         }
     }
 
-    private void Hit()
+    public void Hit(int amount = 1)
     {
         if (this.unbreakable)
         {
             return;
         }
 
-        this.health--;
+        this.health -= amount;
         if (gameplayManager.godMode)
         {
             health = 0;
@@ -48,6 +50,11 @@ public class Brick : MonoBehaviour
             {
                 gameplayManager.audioManager.PlaySound("PowerupSpawn");
                 Instantiate(gameplayManager.powerup, transform.position, transform.rotation);
+            }
+
+            if (bomb)
+            {
+                gameplayManager.Explosion(transform.position);
             }
         }
         else
@@ -64,18 +71,21 @@ public class Brick : MonoBehaviour
         this.spriteRenderer.sprite = this.states[this.health - 1];
 
         powerUpOverlay.SetActive(hasPowerup ? true : false);
+        bombOverlay.SetActive(bomb ? true : false);
     }
 
     public void AddPowerup()
     {
+        if (unbreakable)
+        {
+            return;
+        }
         hasPowerup = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        Ball ball = collision.gameObject.GetComponent<Ball>();
-
-        if (ball != null)
+        if (collision.transform.CompareTag("Projectile"))
         {
             Hit();
         }
