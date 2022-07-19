@@ -6,7 +6,7 @@ public class Powerup : MonoBehaviour
 {
     public Rigidbody2D rigidBody;
     public SpriteRenderer spriteRenderer;
-    public float speed = 5;
+    private float speed = 5;
     public PowerUpType powerUpType;
 
     float currentColor;
@@ -19,8 +19,10 @@ public class Powerup : MonoBehaviour
     void FixedUpdate()
     {
         rigidBody.velocity = new Vector2(0, -1 * speed);
-        currentColor = Mathf.PingPong(Time.time, 1);
+        currentColor = Mathf.PingPong(Time.time * 4, 1);
         spriteRenderer.color = new Color(spriteRenderer.color.r, spriteRenderer.color.g, currentColor, 1);
+        float newSize = (currentColor / 2) + 1f;
+        transform.localScale = new Vector3(newSize, newSize, newSize);
     }
 
     public void CollectPowerup()
@@ -30,7 +32,17 @@ public class Powerup : MonoBehaviour
             case PowerUpType.LifeUp:
                 GameplayManager.I.GainLife();
                 break;
+            case PowerUpType.SpikedBall:
+                GameplayManager.I.RunSpikedPowerup();
+                break;
+            case PowerUpType.Multiball:
+                GameplayManager.I.RunMultiballPowerup();
+                break;
+            case PowerUpType.Clone:
+                GameplayManager.I.RunClonePowerup();
+                break;
         }
+
         Destroy(gameObject);
     }
 }
@@ -38,7 +50,6 @@ public class Powerup : MonoBehaviour
 public enum PowerUpType
 {
     LifeUp,
-    Slow,
     SpikedBall,
     Multiball,
     Clone,

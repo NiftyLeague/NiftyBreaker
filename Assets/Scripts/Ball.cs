@@ -7,24 +7,88 @@ public class Ball : MonoBehaviour
     public AudioManager audioManager;
     public Rigidbody2D rigidBody;
     public SpriteRenderer spriteRenderer;
+    public GameObject spikePowerupOverlay;
+    public Transform startingDirectionPointer;
 
     public float speed = 500f;
+
+    private float noBounceTimer;
+    private Vector2 startingForceDirection;
+
+    private void Update()
+    {
+        noBounceTimer += Time.deltaTime;
+    }
 
     public void ResetBall()
     {
         gameObject.SetActive(true);
 
+        noBounceTimer = 0;
+
         transform.position = Vector2.down;
         rigidBody.velocity = Vector2.zero;
 
-        Invoke(nameof(SetRandomTrajectory), 1f);
+        startingDirectionPointer.gameObject.SetActive(true);
+
+        UpdateSpikePowerup();
+
+        startingForceDirection = Vector2.zero;
+        startingForceDirection.x = Random.Range(-1f, 1f);
+        startingForceDirection.y = -1f;
+
+        startingDirectionPointer.eulerAngles = new Vector3(0, 0, startingForceDirection.x * 60);
+
+        Invoke(nameof(SetRandomDownTrajectory), 1f);
+    }
+
+    public void DeactivateBall()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void HitBall()
+    {
+        noBounceTimer = 0;
+        audioManager.PlaySound("ProjectileHit");
+    }
+
+    public void UpdateSpikePowerup()
+    {
+        spikePowerupOverlay.SetActive(GameplayManager.I.IsSpikedPowerupRunning());
+    }
+
+    private void SetRandomDownTrajectory()
+    {
+        noBounceTimer = 0;
+
+        rigidBody.AddForce(startingForceDirection.normalized * speed);
+
+        startingDirectionPointer.gameObject.SetActive(false);
+    }
+
+    public void SetAsMultiball(Transform mainBallTransform)
+    {
+        gameObject.SetActive(true);
+        UpdateSpikePowerup();
+
+        noBounceTimer = 0;
+
+        transform.position = mainBallTransform.position;
+        rigidBody.velocity = Vector2.zero;
+
+        Vector2 force = Vector2.zero;
+        force.x = Random.Range(-1f, 1f);
+        force.y = 1f;
+
+        rigidBody.AddForce(force.normalized * speed);
     }
 
     private void SetRandomTrajectory()
     {
         Vector2 force = Vector2.zero;
         force.x = Random.Range(-1f, 1f);
-        force.y = -1f;
+        force.y = Random.Range(-1f, 1f);
 
         rigidBody.AddForce(force.normalized * speed);
     }
@@ -32,7 +96,18 @@ public class Ball : MonoBehaviour
     private void OnCollisionEnter2D(Collision2D collision)
     {
         audioManager.PlaySound("BallBounce");
-        rigidBody.velocity = rigidBody.velocity * 1.02f;
+
+        if (noBounceTimer >= 2)
+        {
+            SetRandomTrajectory();
+        }
+
+        noBounceTimer = 0;
+        if (rigidBody.velocity.magnitude < 25)
+        {
+            rigidBody.velocity = rigidBody.velocity * 1.02f;
+        }
+        
         EffectsController.CreateHitEffect(transform.position, 0.1f, false);
     }
 }

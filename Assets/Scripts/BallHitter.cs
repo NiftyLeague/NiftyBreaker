@@ -7,6 +7,9 @@ public class BallHitter : MonoBehaviour
 	public Character playerCharacter;
 	public Collider2D hitCollider;
 	public PlayerOwnerShip playerOwnership;
+	public bool isMainHitter;
+	public BallHitter shadowCloneHitterLeft;
+	public BallHitter shadowCloneHitterRight;
 	float hitterTimer;
 	float currentChargeAmount;
 
@@ -78,7 +81,13 @@ public class BallHitter : MonoBehaviour
 		hitDirection = new Vector2(hitDirectionX, hitDirectionY);
 		hitterTimer = 0;
 		gameObject.SetActive(true);
-		audioManager.PlaySound("BatSwing");
+
+		if (isMainHitter)
+		{
+			audioManager.PlaySound("BatSwing");
+			shadowCloneHitterLeft.TurnOn(attackDirection);
+			shadowCloneHitterRight.TurnOn(attackDirection);
+		}
 	}
 
 	void TurnOff()
@@ -94,6 +103,12 @@ public class BallHitter : MonoBehaviour
 			return;
 		}
 		currentTurnDirection = TurnDirection.Left;
+
+		if (isMainHitter)
+		{
+			shadowCloneHitterLeft.TurnLeft();
+			shadowCloneHitterRight.TurnLeft();
+		}
 	}
 
 	public void TurnRight()
@@ -103,6 +118,12 @@ public class BallHitter : MonoBehaviour
 			return;
 		}
 		currentTurnDirection = TurnDirection.Right;
+
+		if (isMainHitter)
+		{
+			shadowCloneHitterLeft.TurnRight();
+			shadowCloneHitterRight.TurnRight();
+		}
 	}
 
 	private void OnTriggerEnter2D(Collider2D collision)
@@ -111,10 +132,11 @@ public class BallHitter : MonoBehaviour
 
 		if (ball != null)
 		{
-			ball.rigidBody.velocity =  hitDirection * (8 * currentChargeAmount);
-			audioManager.PlaySound("ProjectileHit");
+			ball.rigidBody.velocity =  hitDirection * (10 * currentChargeAmount);
+			ball.HitBall();
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);
 			gameplayManager.SetBallOwnership(playerOwnership);
+			gameplayManager.cameraShake.Shake(0.2f * currentChargeAmount, 1);
 		}
 	}
 }

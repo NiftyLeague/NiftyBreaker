@@ -13,7 +13,8 @@ public class Brick : MonoBehaviour
     public Sprite[] states;
 
     public int health;
-    public int points = 10;
+    
+    private int pointWorth;
 
     public bool unbreakable;
     public bool bomb;
@@ -23,7 +24,7 @@ public class Brick : MonoBehaviour
     {
         gameplayManager = FindObjectOfType<GameplayManager>();
 
-        if (!this.unbreakable)
+        if (!unbreakable)
         {
             UpdateBrickColor();
         }
@@ -31,25 +32,27 @@ public class Brick : MonoBehaviour
 
     public void Hit(int amount = 1)
     {
-        if (this.unbreakable)
+        if (unbreakable)
         {
             return;
         }
 
-        this.health -= amount;
-        if (gameplayManager.godMode)
+        health -= amount;
+        if (gameplayManager.godMode || gameplayManager.IsSpikedPowerupRunning())
         {
             health = 0;
         }
 
-        if (this.health <= 0)
+        if (health <= 0)
         {
-            this.gameObject.SetActive(false);
+            health = 0;
+
+            gameObject.SetActive(false);
 
             if (hasPowerup)
             {
                 gameplayManager.audioManager.PlaySound("PowerupSpawn");
-                Instantiate(gameplayManager.powerup, transform.position, transform.rotation);
+                Instantiate(gameplayManager.GetRandomPowerup(), transform.position, transform.rotation);
             }
 
             if (bomb)
@@ -63,15 +66,17 @@ public class Brick : MonoBehaviour
             shaker.Shake(0.1f, 10);
         }
 
-        gameplayManager.Hit((health+1) * points);
+        gameplayManager.Hit(pointWorth);
     }
 
     private void UpdateBrickColor()
     {
-        this.spriteRenderer.sprite = this.states[this.health - 1];
+        spriteRenderer.sprite = states[health - 1];
 
         powerUpOverlay.SetActive(hasPowerup ? true : false);
         bombOverlay.SetActive(bomb ? true : false);
+
+        pointWorth = health * 10;
     }
 
     public void AddPowerup()

@@ -25,10 +25,11 @@ public class GameplayManager : MonoBehaviour
 	public ObscuredInt hits;
 	public ObscuredInt xp;
 	[Space]
-	public List<GameObject> playerLifePips;
-	public Ball ball;
+	public List<SpriteRenderer> playerLifePips;
+	public List<Ball> balls;
 	public List<Transform> stages;
-	public GameObject powerup;
+	public List<GameObject> powerups;
+	public List<GameObject> clones;
 	[Space]
 	public ObscuredFloat currentSpeedIncrease;
 	public CameraShake cameraShake;
@@ -39,6 +40,10 @@ public class GameplayManager : MonoBehaviour
 	public TextMeshProUGUI levelText;
 	public TextMeshProUGUI gameOverStatNamesText;
 	public TextMeshProUGUI gameOverStatNumbersText;
+	public TextMeshProUGUI powerupCloneTimerText;
+	public TextMeshProUGUI powerupSpikedballTimerText;
+	public GameObject powerupCloneTimerIcon;
+	public GameObject powerupSpikedballTimerIcon;
 	public GameObject gameOverBackground;
 	public GameObject gameOverSkipPrompt;
 	public GameObject scoreGainedUIPrefab;
@@ -57,6 +62,8 @@ public class GameplayManager : MonoBehaviour
 
 	Coroutine currentScoreTextCoroutine;
 
+	ObscuredFloat spikedBallPowerupTimer;
+	ObscuredFloat clonesPowerupTimer;
 	float gameOverTimer1;
 	float gameOverTimer2;
 
@@ -116,6 +123,30 @@ public class GameplayManager : MonoBehaviour
 		}
 
 		timePlayed += Time.deltaTime;
+
+		if (spikedBallPowerupTimer > 0)
+		{
+			spikedBallPowerupTimer -= Time.deltaTime;
+
+			if (spikedBallPowerupTimer <= 0)
+			{
+				TurnOffPowerup(PowerUpType.SpikedBall);
+			}
+
+			powerupSpikedballTimerText.text = spikedBallPowerupTimer.ToString("0.0");
+		}
+
+		if (clonesPowerupTimer > 0)
+		{
+			clonesPowerupTimer -= Time.deltaTime;
+
+			if (clonesPowerupTimer <= 0)
+			{
+				TurnOffPowerup(PowerUpType.Clone);
+			}
+
+			powerupCloneTimerText.text = clonesPowerupTimer.ToString("0.0");
+		}
 	}
 
 	public void ScorePoints(int amount)
@@ -157,13 +188,20 @@ public class GameplayManager : MonoBehaviour
 
 	public void LoseBall()
 	{
-		if (currentPlayerOwnership == PlayerOwnerShip.None)
+		bool isAtleastOneBallThere = IsAtleastOneBallActive();
+
+		if (currentPlayerOwnership == PlayerOwnerShip.None || isAtleastOneBallThere)
 		{
 			audioManager.PlaySound("LoseNoOwnership");
 		}
 		else
 		{
 			audioManager.PlaySound("Lose");
+		}
+
+		if (isAtleastOneBallThere)
+		{
+			return;
 		}
 
 		if (currentPlayerOwnership == PlayerOwnerShip.Player1 && !godMode)
@@ -182,7 +220,8 @@ public class GameplayManager : MonoBehaviour
 
 	private void Reset()
 	{
-		ball.ResetBall();
+		TurnOffAllPowerups();
+		balls[0].ResetBall();
 		multiplier = 1.0f;
 		SetBallOwnership(PlayerOwnerShip.None);
 		UpdateScoreTexts();
@@ -206,10 +245,16 @@ public class GameplayManager : MonoBehaviour
 		switch (currentPlayerOwnership)
 		{
 			case PlayerOwnerShip.None:
-				ball.spriteRenderer.color = Color.white;
+				foreach (Ball ball in balls)
+				{
+					ball.spriteRenderer.color = Color.white;
+				}
 				break;
 			case PlayerOwnerShip.Player1:
-				ball.spriteRenderer.color = playerOwnershipColor;
+				foreach (Ball ball in balls)
+				{
+					ball.spriteRenderer.color = playerOwnershipColor;
+				}
 				break;
 		}
 	}
@@ -220,11 +265,12 @@ public class GameplayManager : MonoBehaviour
 		{
 			return;
 		}
+		TurnOffAllPowerups();
 		hasGameEnded = true;
 		cameraShake.Shake(0.5f, 5);
 		IncreaseSpeed(true);
 		playerCharacter.Lose();
-		ball.gameObject.SetActive(false);
+		balls[0].gameObject.SetActive(false);
 		menuManager.UpdateLeaderboards();
 		//EventController.AddMatchEnd(PlayerSpriteManager.lastDegenIdUsed);
 
@@ -232,6 +278,63 @@ public class GameplayManager : MonoBehaviour
 
 		//Analytics.SendPlayerEvent("EndMatch", new Dictionary<string, string>() { { "Score", score.ToString() } });
 
+	}
+
+	public void RunMultiballPowerup()
+	{
+		Transform mainBall = balls[0].transform;
+
+		foreach (Ball ball in balls)
+		{
+			if (ball.gameObject.activeInHierarchy)
+			{
+				mainBall = ball.transform;
+			}
+		}
+
+		foreach (Ball ball in balls)
+		{
+			if (!ball.gameObject.activeInHierarchy)
+			{
+				ball.SetAsMultiball(mainBall);
+			}
+		}
+	}
+
+	public void RunClonePowerup()
+	{
+		powerupCloneTimerText.gameObject.SetActive(true);
+		powerupCloneTimerIcon.SetActive(true);
+
+		clonesPowerupTimer = 10;
+
+		foreach (GameObject clone in clones)
+		{
+			clone.SetActive(true);
+		}
+	}
+
+	public void RunSpikedPowerup()
+	{
+		powerupSpikedballTimerText.gameObject.SetActive(true);
+		powerupSpikedballTimerIcon.SetActive(true);
+
+		spikedBallPowerupTimer = 10;
+
+		foreach (Ball ball in balls)
+		{
+			ball.UpdateSpikePowerup();
+		}
+	}
+
+	public bool IsSpikedPowerupRunning()
+	{
+		if (spikedBallPowerupTimer > 0)
+		{
+			return true;
+		}
+
+		return false;
 	}
 
 	public void GainLife()
@@ -243,15 +346,57 @@ public class GameplayManager : MonoBehaviour
 
 	public void UpdateLives()
 	{
-		foreach (GameObject pip in playerLifePips)
+		foreach (SpriteRenderer pip in playerLifePips)
 		{
-			pip.SetActive(false);
+			pip.enabled = false;
 		}
 
 		for (int i = 0; i < lives; i++)
 		{
-			playerLifePips[i].SetActive(true);
+			playerLifePips[i].enabled = true;
 		}
+
+		if (lives <= 1)
+		{
+			playerLifePips[0].color = Color.red;
+			playerLifePips[0].GetComponent<SimpleAnim>().animSpeed = 0.1f;
+		}
+		else
+		{
+			playerLifePips[0].color = playerOwnershipColor;
+			playerLifePips[0].GetComponent<SimpleAnim>().animSpeed = 0.5f;
+		}
+	}
+
+	public void TurnOffPowerup(PowerUpType powerUpType)
+	{
+		switch (powerUpType)
+		{
+			case PowerUpType.SpikedBall:
+				powerupSpikedballTimerText.gameObject.SetActive(false);
+				powerupSpikedballTimerIcon.SetActive(false);
+				spikedBallPowerupTimer = 0;
+				foreach (Ball ball in balls)
+				{
+					ball.UpdateSpikePowerup();
+				}
+				break;
+			case PowerUpType.Clone:
+				powerupCloneTimerText.gameObject.SetActive(false);
+				powerupCloneTimerIcon.SetActive(false);
+				clonesPowerupTimer = 0;
+				foreach (GameObject clone in clones)
+				{
+					clone.SetActive(false);
+				}
+				break;
+		}
+	}
+
+	public void TurnOffAllPowerups()
+	{
+		TurnOffPowerup(PowerUpType.SpikedBall);
+		TurnOffPowerup(PowerUpType.Clone);
 	}
 
 	public void IncreaseSpeed(bool reset = false)
@@ -306,6 +451,10 @@ public class GameplayManager : MonoBehaviour
 
 		SetupNewMap();
 
+		foreach (Ball ball in balls)
+		{
+			ball.DeactivateBall();
+		}
 		Reset();
 		//Analytics.SendPlayerEvent("StartMatch");
 	}
@@ -382,6 +531,8 @@ public class GameplayManager : MonoBehaviour
 
 	IEnumerator AnimateScoreText()
 	{
+		playerScoreText.color = Color.white;
+
 		float a = 0.09f;
 		float b = 0.1f;
 
@@ -392,6 +543,8 @@ public class GameplayManager : MonoBehaviour
 			yield return new WaitForEndOfFrame();
 			playerScoreText.transform.localScale = new Vector3(0.1f, scaleTween.Update(Time.deltaTime), 0.1f);
 		}
+
+		playerScoreText.color = playerOwnershipColor;
 	}
 
 	private bool Cleared()
@@ -405,6 +558,24 @@ public class GameplayManager : MonoBehaviour
 		}
 
 		return true;
+	}
+
+	private bool IsAtleastOneBallActive()
+	{
+		foreach (Ball ball in balls)
+		{
+			if (ball.gameObject.activeInHierarchy)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	public GameObject GetRandomPowerup()
+	{
+		return powerups[Random.Range(0, powerups.Count)];
 	}
 
 	private void SetupNewMap()

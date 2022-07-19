@@ -155,6 +155,8 @@ MonoBehaviour:
     rgba: 4294930688
   - serializedVersion: 2
     rgba: 4294939648
+  - serializedVersion: 2
+    rgba: 4294954634
   randomPlayer2Colors:
   - serializedVersion: 2
     rgba: 4278227967

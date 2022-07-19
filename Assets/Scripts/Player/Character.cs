@@ -1556,7 +1556,7 @@ public class Character : MonoBehaviour
 
     public void Lose()
     {
-        transform.position = new Vector2(transform.position.x, -5.2f);
+        transform.position = new Vector2(transform.position.x, -5f);
         hasLost = true;
         velocity.x = 0;
         onGround = true;

@@ -10,6 +10,7 @@ public class LoseZone : MonoBehaviour
 
         if (ball != null)
         {
+            ball.DeactivateBall();
             FindObjectOfType<GameplayManager>().LoseBall();
         }
     }
