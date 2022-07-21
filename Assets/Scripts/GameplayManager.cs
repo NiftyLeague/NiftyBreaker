@@ -220,7 +220,6 @@ public class GameplayManager : MonoBehaviour
 
 	private void Reset()
 	{
-		TurnOffAllPowerups();
 		balls[0].ResetBall();
 		multiplier = 1.0f;
 		SetBallOwnership(PlayerOwnerShip.None);
@@ -455,6 +454,7 @@ public class GameplayManager : MonoBehaviour
 		{
 			ball.DeactivateBall();
 		}
+		TurnOffAllPowerups();
 		Reset();
 		//Analytics.SendPlayerEvent("StartMatch");
 	}
@@ -589,13 +589,10 @@ public class GameplayManager : MonoBehaviour
 
 		foreach (Transform brick in stages[currentlevel -1])
 		{
-			if (Random.value <= powerUpSpawnChance)
-			{
-				brick.GetComponent<Brick>().AddPowerup();
-			}
+			brick.GetComponent<Brick>().ActivateBrick();
 		}
 
-		levelText.text = "LEVEL\n<size=10>" + totalLevel.ToString("0");
+		levelText.text = "STAGE\n<size=10>" + totalLevel.ToString("0");
 	}
 }
 

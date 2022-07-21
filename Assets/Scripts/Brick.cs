@@ -12,6 +12,7 @@ public class Brick : MonoBehaviour
 
     public Sprite[] states;
 
+    private int originalHealth;
     public int health;
     
     private int pointWorth;
@@ -19,16 +20,7 @@ public class Brick : MonoBehaviour
     public bool unbreakable;
     public bool bomb;
     bool hasPowerup;
-
-    private void Start()
-    {
-        gameplayManager = FindObjectOfType<GameplayManager>();
-
-        if (!unbreakable)
-        {
-            UpdateBrickColor();
-        }
-    }
+    bool firstTimeActivated = true;
 
     public void Hit(int amount = 1)
     {
@@ -69,23 +61,51 @@ public class Brick : MonoBehaviour
         gameplayManager.Hit(pointWorth);
     }
 
+    public void InitializeBrick(int health, bool indestructableBrick = false, bool bombBrick = false)
+    {
+        this.health = health;
+        unbreakable = indestructableBrick;
+        bomb = bombBrick;
+
+        ActivateBrick();
+    }
+
+    public void ActivateBrick()
+    {
+        if (firstTimeActivated)
+        {
+            originalHealth = health;
+            firstTimeActivated = false;
+        }
+
+        health = originalHealth;
+        hasPowerup = false;
+        gameObject.SetActive(true);
+
+        if (gameplayManager == null)
+        {
+            gameplayManager = FindObjectOfType<GameplayManager>();
+        }
+
+        if (!unbreakable)
+        {
+            if (Random.value <= gameplayManager.powerUpSpawnChance)
+            {
+                hasPowerup = true;
+            }
+        }
+        
+        UpdateBrickColor();
+    }
+
     private void UpdateBrickColor()
     {
-        spriteRenderer.sprite = states[health - 1];
+        spriteRenderer.sprite = states[health];
 
         powerUpOverlay.SetActive(hasPowerup ? true : false);
         bombOverlay.SetActive(bomb ? true : false);
 
         pointWorth = health * 10;
-    }
-
-    public void AddPowerup()
-    {
-        if (unbreakable)
-        {
-            return;
-        }
-        hasPowerup = true;
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

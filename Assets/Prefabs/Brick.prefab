@@ -106,13 +106,13 @@ MonoBehaviour:
   powerUpOverlay: {fileID: 6360969968232940703}
   bombOverlay: {fileID: 7966832262981945432}
   states:
+  - {fileID: 21300000, guid: b98fe5fbb10ae0e45b22e7caaff5c70c, type: 3}
   - {fileID: 21300000, guid: 8d9ee6383354ffc4aa4ad6c8f3cdbfac, type: 3}
   - {fileID: 21300000, guid: b28a32d99e63b5445b2e2b76dc04b5d8, type: 3}
   - {fileID: 21300000, guid: e4dde99bad2a99641ad7da2e650b101f, type: 3}
   - {fileID: 21300000, guid: 32a46afc751fabb4c8b76a1f7840be1e, type: 3}
   - {fileID: 21300000, guid: 7e03bdd6d3e56d144b484523324cf5b3, type: 3}
   health: 1
-  points: 10
   unbreakable: 0
   bomb: 0
 --- !u!61 &-6110579130447239354
