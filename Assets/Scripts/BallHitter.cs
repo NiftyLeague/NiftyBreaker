@@ -3,6 +3,7 @@ using UnityEngine;
 public class BallHitter : MonoBehaviour
 {
 	public GameplayManager gameplayManager;
+	public PlayerController playerController;
 	public AudioManager audioManager;
 	public Character playerCharacter;
 	public Collider2D hitCollider;
@@ -12,6 +13,7 @@ public class BallHitter : MonoBehaviour
 	public BallHitter shadowCloneHitterRight;
 	float hitterTimer;
 	float currentChargeAmount;
+	bool nextBallHitIsFullyCharged;
 
 	TurnDirection currentTurnDirection = TurnDirection.Right;
 	Vector2 hitDirection;
@@ -78,12 +80,14 @@ public class BallHitter : MonoBehaviour
 				break;
 		}
 		currentChargeAmount = 1 + (playerCharacter.attackChargeM / 2);
+		nextBallHitIsFullyCharged = playerCharacter.attackChargeM >= 1;
 		hitDirection = new Vector2(hitDirectionX, hitDirectionY);
 		hitterTimer = 0;
 		gameObject.SetActive(true);
 
 		if (isMainHitter)
 		{
+			playerController.ChargeEffectReset();
 			audioManager.PlaySound("BatSwing");
 			shadowCloneHitterLeft.TurnOn(attackDirection);
 			shadowCloneHitterRight.TurnOn(attackDirection);
@@ -133,7 +137,7 @@ public class BallHitter : MonoBehaviour
 		if (ball != null)
 		{
 			ball.rigidBody.velocity =  hitDirection * (10 * currentChargeAmount);
-			ball.HitBall();
+			ball.HitBall(nextBallHitIsFullyCharged);
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);
 			gameplayManager.SetBallOwnership(playerOwnership);
 			gameplayManager.cameraShake.Shake(0.2f * currentChargeAmount, 1);

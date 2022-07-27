@@ -8,6 +8,7 @@ public class Ball : MonoBehaviour
     public Rigidbody2D rigidBody;
     public SpriteRenderer spriteRenderer;
     public GameObject spikePowerupOverlay;
+    public GameObject fullyChargedOverlay;
     public Transform startingDirectionPointer;
 
     public float speed = 500f;
@@ -23,6 +24,7 @@ public class Ball : MonoBehaviour
     public void ResetBall()
     {
         gameObject.SetActive(true);
+        fullyChargedOverlay.SetActive(false);
 
         noBounceTimer = 0;
 
@@ -47,10 +49,11 @@ public class Ball : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void HitBall()
+    public void HitBall(bool isBallFullyCharged = false)
     {
         noBounceTimer = 0;
         audioManager.PlaySound("ProjectileHit");
+        fullyChargedOverlay.SetActive(isBallFullyCharged);
     }
 
     public void UpdateSpikePowerup()

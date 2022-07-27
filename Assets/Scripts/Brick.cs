@@ -22,7 +22,7 @@ public class Brick : MonoBehaviour
     bool hasPowerup;
     bool firstTimeActivated = true;
 
-    public void Hit(int amount = 1)
+    public void Hit(int amount = 1, bool isBallFullyCharged = false)
     {
         if (unbreakable)
         {
@@ -58,7 +58,12 @@ public class Brick : MonoBehaviour
             shaker.Shake(0.1f, 10);
         }
 
-        gameplayManager.Hit(pointWorth);
+        int pointsGained = pointWorth;
+        if (isBallFullyCharged)
+        {
+            pointsGained *= 2;
+        }
+        gameplayManager.Hit(pointsGained);
     }
 
     public void InitializeBrick(int health, bool indestructableBrick = false, bool bombBrick = false)
@@ -112,7 +117,7 @@ public class Brick : MonoBehaviour
     {
         if (collision.transform.CompareTag("Projectile"))
         {
-            Hit();
+            Hit(1, collision.gameObject.GetComponent<Ball>().fullyChargedOverlay.activeInHierarchy);
         }
     }
 }
