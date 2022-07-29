@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
 public class StageMaker : MonoBehaviour
 {
@@ -27,7 +28,9 @@ public class StageMaker : MonoBehaviour
 
                 if (colorOnPixel != noBrickColor)
                 {
-                    var newBrick = Instantiate(brickPrefab, transform);
+                    GameObject newBrick = PrefabUtility.InstantiatePrefab(brickPrefab.gameObject as GameObject) as GameObject;
+                    newBrick.transform.parent = transform;
+                    //var newBrick = Instantiate(brickPrefab, transform);
                     newBrick.transform.localPosition = new Vector3((x * 2) - 13, y - 0.5f);
                     Brick currentBrick = newBrick.GetComponent<Brick>();
 

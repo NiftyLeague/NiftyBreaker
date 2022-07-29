@@ -7,8 +7,10 @@ public class Brick : MonoBehaviour
     private GameplayManager gameplayManager;
     public SpriteRenderer spriteRenderer;
     public CameraShake shaker;
+    public GameObject hitOverlay;
     public GameObject powerUpOverlay;
     public GameObject bombOverlay;
+    public GameObject brickBreakApartPrefab;
 
     public Sprite[] states;
 
@@ -39,6 +41,9 @@ public class Brick : MonoBehaviour
         {
             health = 0;
 
+            var newBrickBreakApart = Instantiate(brickBreakApartPrefab, transform.parent.transform);
+            newBrickBreakApart.transform.position = transform.position;
+            gameplayManager.audioManager.PlaySound("BrickBreak");
             gameObject.SetActive(false);
 
             if (hasPowerup)
@@ -55,7 +60,8 @@ public class Brick : MonoBehaviour
         else
         {
             UpdateBrickColor();
-            shaker.Shake(0.1f, 10);
+            StartCoroutine(HitFlash());
+            shaker.Shake(0.2f, 10);
         }
 
         int pointsGained = pointWorth;
@@ -111,6 +117,15 @@ public class Brick : MonoBehaviour
         bombOverlay.SetActive(bomb ? true : false);
 
         pointWorth = health * 10;
+    }
+
+    IEnumerator HitFlash()
+    {
+        hitOverlay.SetActive(true);
+
+        yield return new WaitForSeconds(0.06f);
+
+        hitOverlay.SetActive(false);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

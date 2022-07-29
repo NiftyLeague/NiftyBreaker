@@ -8,11 +8,13 @@ public class PlayerController : MonoBehaviour
 	public GameplayManager gameplayManager;
 	public SpriteRenderer playerSpriteRenderer;
 	public SpriteRenderer chargeEffectSpriteRenderer;
+	public SpriteRenderer almostDeadEffectSpriteRenderer;
 	public GameObject chargeEffectClouds;
 	public Transform playerTransform;
 
 	private InputState input = new InputState();
 	bool canPlayChargeEffect = true;
+	float almostDeadAlpha;
 
 	private void Start()
 	{
@@ -44,6 +46,18 @@ public class PlayerController : MonoBehaviour
 	{
 		chargeEffectSpriteRenderer.sprite = playerSpriteRenderer.sprite;
 		chargeEffectSpriteRenderer.transform.localScale = playerSpriteRenderer.transform.localScale;
+
+		almostDeadAlpha = Mathf.PingPong(Time.time * 2, 1);
+		if (gameplayManager.lives == 1)
+		{
+			almostDeadEffectSpriteRenderer.sprite = playerSpriteRenderer.sprite;
+			almostDeadEffectSpriteRenderer.transform.localScale = playerSpriteRenderer.transform.localScale;
+			almostDeadEffectSpriteRenderer.color = new Color(0.75f, 0, 0, almostDeadAlpha);
+		}
+		else
+		{
+			almostDeadEffectSpriteRenderer.color = new Color(0.75f, 0, 0, 0);
+		}
 	}
 
 	public void CommenceChargeEffect()

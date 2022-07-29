@@ -355,10 +355,11 @@ public class GameplayManager : MonoBehaviour
 			playerLifePips[i].enabled = true;
 		}
 
-		if (lives <= 1)
+		if (lives == 1)
 		{
 			playerLifePips[0].color = Color.red;
 			playerLifePips[0].GetComponent<SimpleAnim>().animSpeed = 0.1f;
+			audioManager.PlaySound("AlmostDead");
 		}
 		else
 		{
@@ -461,7 +462,7 @@ public class GameplayManager : MonoBehaviour
 
 	IEnumerator PlayGameOverScreen()
 	{
-		audioManager.PlaySound("Lose");
+		audioManager.PlaySound("Lose", 0.5f);
 		gameOverBackground.SetActive(true);
 		endOfGameStatsText.text = "GAME OVER";
 
