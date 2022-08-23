@@ -270,6 +270,10 @@ public class PlayerSpriteManager : MonoBehaviour
 		characterAnimator.attackRecoverUp.Clear();
 		for (int i = 47; i <= 48; i++)
 			characterAnimator.attackRecoverUp.Add(spritesToUse[i]);
+
+		characterAnimator.win.Clear();
+		for (int i = 114; i <= 117; i++)
+			characterAnimator.win.Add(spritesToUse[i]);
 	}
 
 	public void SetLoadingDegensText(int min, int max)

@@ -18,6 +18,7 @@ public class CharacterAnimator : MonoBehaviour
         WallSlide,
         Tongue,
         Lost,
+        Won,
     }
 
     enum AttackDirection
@@ -242,6 +243,9 @@ public class CharacterAnimator : MonoBehaviour
             case AnimState.Lost:
                 AnimateLose();
                 break;
+            case AnimState.Won:
+                AnimateWin();
+                break;
             default:
                 break;
         }
@@ -271,6 +275,11 @@ public class CharacterAnimator : MonoBehaviour
     void AnimateLose()
     {
         RunAnimation(skid, 0.05f);
+    }
+
+    void AnimateWin()
+    {
+        RunAnimation(win, 0.5f);
     }
 
     void AnimateIdle()
@@ -834,6 +843,10 @@ public class CharacterAnimator : MonoBehaviour
         else if (character.state == CharacterState.Lost)
         {
             return AnimState.Lost;
+        }
+        else if (character.state == CharacterState.Won)
+        {
+            return AnimState.Won;
         }
 
         return AnimState.Idle;

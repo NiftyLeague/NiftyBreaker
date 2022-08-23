@@ -12,6 +12,7 @@ public class GameplayManager : MonoBehaviour
 	public MenuManager menuManager;
 	public AudioManager audioManager;
 	public Character playerCharacter;
+	public TransitionManager transitionManager;
 	[Space]
 	public int currentlevel = 1;
 	public int totalLevel = 1;
@@ -79,6 +80,7 @@ public class GameplayManager : MonoBehaviour
 		UpdateScoreTexts();
 		ResetEverythingForANewGame();
 		menuManager.menuPanel.SetActive(false);
+		StartCoroutine(transitionManager.FirstStartTransition());
 	}
 
     private void Update()
@@ -101,6 +103,19 @@ public class GameplayManager : MonoBehaviour
 					audioManager.PlaySound("MenuOptionSelect");
 					return;
 				}
+			}
+		}
+
+		if (Input.GetKeyDown(KeyCode.Q))
+		{
+			if (godMode)
+			{
+				foreach (Transform brick in stages[currentlevel - 1])
+				{
+					brick.gameObject.SetActive(false);
+				}
+
+				CheckIfClearedLevel();
 			}
 		}
 	}
@@ -215,16 +230,21 @@ public class GameplayManager : MonoBehaviour
 			}
 		}
 	
-		Reset();
+		ResetBall();
 	}
 
-	private void Reset()
+	public void ResetBall()
 	{
 		balls[0].ResetBall();
-		multiplier = 1.0f;
 		SetBallOwnership(PlayerOwnerShip.None);
-		UpdateScoreTexts();
+		ResetMultiplier();
 	}
+
+	public void ResetMultiplier()
+	{
+		multiplier = 1.0f;
+		UpdateScoreTexts();
+	}	
 
 	public void Explosion(Vector3 position)
 	{
@@ -413,18 +433,30 @@ public class GameplayManager : MonoBehaviour
 		points = (int)(points * multiplier);
 		multiplier += 0.1f;
 		ScorePoints(points);
+		CheckIfClearedLevel();
+	}
 
-		if (Cleared())
+	private void WinLevel()
+	{
+		audioManager.PlaySound("PowerupGet");
+		playerCharacter.Win();
+		foreach (Ball ball in balls)
 		{
-			currentlevel++;
-			totalLevel++;
-			if (currentlevel > stages.Count)
-			{
-				currentlevel = 1;
-			}
-			Reset();
-			SetupNewMap();
+			ball.DeactivateBall();
 		}
+		StartCoroutine(transitionManager.NextLevelTransition());
+	}
+
+	public void ProgressToTheNextLevel()
+	{
+		currentlevel++;
+		totalLevel++;
+		if (currentlevel > stages.Count)
+		{
+			currentlevel = 1;
+		}
+		playerCharacter.StandBackUp();
+		SetupNewMap();
 	}
 
 	public void ResetEverythingForANewGame()
@@ -456,7 +488,6 @@ public class GameplayManager : MonoBehaviour
 			ball.DeactivateBall();
 		}
 		TurnOffAllPowerups();
-		Reset();
 		//Analytics.SendPlayerEvent("StartMatch");
 	}
 
@@ -548,7 +579,7 @@ public class GameplayManager : MonoBehaviour
 		playerScoreText.color = playerOwnershipColor;
 	}
 
-	private bool Cleared()
+	private bool CheckIfClearedLevel()
 	{
 		for (int i = 0; i < stages[currentlevel - 1].childCount; i++)
 		{
@@ -557,6 +588,8 @@ public class GameplayManager : MonoBehaviour
 				return false;
 			}
 		}
+
+		WinLevel();
 
 		return true;
 	}

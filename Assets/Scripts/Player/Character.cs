@@ -10,7 +10,8 @@ public enum CharacterState
     Attacking,
     Bouncing,
     Tounge,
-    Lost
+    Lost,
+    Won,
 }
 public enum AttackState
 {
@@ -1567,6 +1568,15 @@ public class Character : MonoBehaviour
         onGround = true;
         state = CharacterState.Lost;
         attackState = AttackState.Idle;    
+    }
+
+    public void Win()
+    {
+        transform.position = new Vector2(transform.position.x, -5f);
+        velocity.x = 0;
+        onGround = true;
+        state = CharacterState.Won;
+        attackState = AttackState.Idle;
     }
 
     public void StandBackUp()

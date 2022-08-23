@@ -49,8 +49,12 @@ public class Ball : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    public void HitBall(bool isBallFullyCharged = false)
+    public void HitBall(bool hitWithBat, bool isBallFullyCharged = false)
     {
+        if (hitWithBat)
+        {
+            GameplayManager.I.ScorePoints(5);
+        }
         noBounceTimer = 0;
         audioManager.PlaySound("ProjectileHit");
         fullyChargedOverlay.SetActive(isBallFullyCharged);

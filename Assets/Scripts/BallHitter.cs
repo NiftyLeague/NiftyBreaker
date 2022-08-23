@@ -136,8 +136,8 @@ public class BallHitter : MonoBehaviour
 
 		if (ball != null)
 		{
-			ball.rigidBody.velocity =  hitDirection * (10 * currentChargeAmount);
-			ball.HitBall(nextBallHitIsFullyCharged);
+			ball.rigidBody.velocity = hitDirection * (11 * currentChargeAmount);
+			ball.HitBall(true, nextBallHitIsFullyCharged);
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);
 			gameplayManager.SetBallOwnership(playerOwnership);
 			gameplayManager.cameraShake.Shake(0.2f * currentChargeAmount, 1);
