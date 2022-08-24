@@ -748,14 +748,14 @@ public class Character : MonoBehaviour
         if (OnGround && !wasOnGround)
         {
             //SoundController.PlaySoundEffect("Land", 0.4f, transform.position);
-            audioManager.PlaySound("PlayerLand");
+            //audioManager.PlaySound("PlayerLand");
             jumpCooldownLeft = 0.1f;
 
         }
         if (WallSliding && !wasWallSlide)
         {
             //SoundController.PlaySoundEffect("Land", 0.4f, transform.position);
-            audioManager.PlaySound("PlayerLand");
+            //audioManager.PlaySound("PlayerLand");
             jumpCooldownLeft = 0.1f;
         }
 

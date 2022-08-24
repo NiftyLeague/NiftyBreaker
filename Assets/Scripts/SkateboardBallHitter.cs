@@ -12,6 +12,11 @@ public class SkateboardBallHitter : MonoBehaviour
 
 		if (ball != null)
 		{
+			if (ball.hasBeenHitRecently)
+			{
+				return;
+			}
+
 			ball.rigidBody.velocity = new Vector2(Random.Range(0.1f, 1.0f), Random.Range(0.3f, 1.0f)) * 10;
 			ball.HitBall(false);
 			EffectsController.CreateHitEffect(collision.transform.position, 0.1f, false);

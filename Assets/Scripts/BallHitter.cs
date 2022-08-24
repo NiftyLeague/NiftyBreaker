@@ -136,6 +136,10 @@ public class BallHitter : MonoBehaviour
 
 		if (ball != null)
 		{
+			if (ball.hasBeenHitRecently)
+			{
+				return;
+			}
 			ball.rigidBody.velocity = hitDirection * (11 * currentChargeAmount);
 			ball.HitBall(true, nextBallHitIsFullyCharged);
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);

@@ -110,5 +110,11 @@ public class PlayerController : MonoBehaviour
 			gameplayManager.audioManager.PlaySound("PowerupGet");
 			collision.GetComponent<Powerup>().CollectPowerup();
 		}
+
+		if (collision.CompareTag("Bomb"))
+		{
+			collision.GetComponent<Bomb>().BlowUpBomb();
+			gameplayManager.LoseLife();
+		}
 	}
 }

@@ -10,6 +10,7 @@ public class GameplayManager : MonoBehaviour
 	public static GameplayManager I;
 
 	public MenuManager menuManager;
+	public BossController bossController;
 	public AudioManager audioManager;
 	public Character playerCharacter;
 	public TransitionManager transitionManager;
@@ -219,18 +220,27 @@ public class GameplayManager : MonoBehaviour
 			return;
 		}
 
-		if (currentPlayerOwnership == PlayerOwnerShip.Player1 && !godMode)
+		if (currentPlayerOwnership == PlayerOwnerShip.Player1)
 		{
-			lives--;
-			UpdateLives();
-			if (lives <= 0)
-			{
-				Lose();
-				return;
-			}
+			LoseLife();
 		}
 	
 		ResetBall();
+	}
+
+	public void LoseLife()
+	{
+		if (godMode)
+		{
+			return;
+		}
+
+		lives--;
+		UpdateLives();
+		if (lives <= 0)
+		{
+			Lose();
+		}
 	}
 
 	public void ResetBall()
