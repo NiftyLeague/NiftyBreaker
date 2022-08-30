@@ -8,8 +8,6 @@ public class BossController : MonoBehaviour
 {
     public GameplayManager gameplayManager;
     [Space]
-    public ObscuredInt health = 20;
-    public ObscuredInt almostDeadHealth = 10;
     public Transform bossTransform;
     public SpriteRenderer bossSpriteRenderer;
     public SpriteRenderer bossAlmostDeadOverlaySpriteRenderer;
@@ -20,10 +18,21 @@ public class BossController : MonoBehaviour
     public GameObject healthBarParent;
     public Image healthBarCurrent;
     public Image healthBarBefore;
+    public Transform bombProjectileStart;
+    public GameObject bombProjectilePrefab;
+    [Space]
+    public ObscuredInt health = 20;
+    public ObscuredInt almostDeadHealth = 10;
+    public ObscuredFloat moveSpeed = 5;
+    [Space]
+    public ObscuredFloat bossOnStageYPosition = -0.82f;
 
+    private Vector2 currentMoveDirection = Vector2.left;
+    private bool isMoving = true;
     private float almostDeadAlpha;
     private Coroutine currentActionCoroutine;
     private float healthBarBeforeAmount;
+    private float bombDropTimer = 1;
 
     private void Update()
     {
@@ -35,8 +44,36 @@ public class BossController : MonoBehaviour
             bossAlmostDeadOverlaySpriteRenderer.color = new Color(bossAlmostDeadOverlaySpriteRenderer.color.r, bossAlmostDeadOverlaySpriteRenderer.color.g, bossAlmostDeadOverlaySpriteRenderer.color.b, almostDeadAlpha);
         }
 
+        healthBarParent.transform.position = new Vector3(bossTransform.position.x, bossTransform.position.y + 3.5f);
         healthBarBeforeAmount = Mathf.Lerp(healthBarBeforeAmount, (float)health, 0.005f);
         healthBarBefore.fillAmount = healthBarBeforeAmount / (float)20;
+
+        if (!isMoving)
+        {
+            return;
+        }
+
+        if (bossTransform.position.x <= -11f)
+        {
+            bossTransform.position = new Vector2(-10, bossOnStageYPosition);
+            SetDirection(FacingDirection.Right);
+        }
+        else if (bossTransform.position.x >= 11f)
+        {
+            bossTransform.position = new Vector2(10, bossOnStageYPosition);
+            SetDirection(FacingDirection.Left);
+        }
+
+        bombDropTimer -= Time.deltaTime;
+
+        if (bombDropTimer <= 0)
+        {
+            bombDropTimer = Random.Range(0.1f, 2.0f);
+
+            Instantiate(bombProjectilePrefab, bombProjectileStart.position, bombProjectilePrefab.transform.rotation, transform);
+        }
+
+        bossTransform.Translate((currentMoveDirection * moveSpeed) * Time.deltaTime);
     }
 
     void UpdateHealthBar()
@@ -78,6 +115,21 @@ public class BossController : MonoBehaviour
         StopAllCoroutines();
     }
 
+    void SetDirection(FacingDirection direction)
+    {
+        switch (direction)
+        {
+            case FacingDirection.Left:
+                currentMoveDirection = Vector2.left;
+                bossTransform.localScale = new Vector3(1, 1, 1);
+                break;
+            case FacingDirection.Right:
+                currentMoveDirection = Vector2.right;
+                bossTransform.localScale = new Vector3(-1, 1, 1);
+                break;
+        }
+    }
+
     IEnumerator TakeDamageAnimation()
     {
         bossShaker.Shake(0.2f, 10);
@@ -87,4 +139,11 @@ public class BossController : MonoBehaviour
 
         bossSpriteRenderer.material = defaultSpriteMaterial;
     }
+}
+
+public enum FacingDirection
+{
+    None,
+    Left,
+    Right,
 }

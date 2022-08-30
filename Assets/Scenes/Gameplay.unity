@@ -16340,6 +16340,7 @@ MonoBehaviour:
   bossController: {fileID: 1727383209}
   audioManager: {fileID: 201607129}
   playerCharacter: {fileID: 1489606863}
+  playerController: {fileID: 192207255}
   transitionManager: {fileID: 1011465859}
   currentlevel: 1
   totalLevel: 1
@@ -30668,6 +30669,7 @@ Transform:
   m_Children:
   - {fileID: 1987177916}
   - {fileID: 777967648}
+  - {fileID: 1086343632}
   m_Father: {fileID: 1589952814}
   m_RootOrder: 21
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -85171,6 +85173,36 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1085495833}
   m_CullTransparentMesh: 1
+--- !u!1 &1086343631
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1086343632}
+  m_Layer: 12
+  m_Name: Bomb Spawn Location
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1086343632
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1086343631}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2.9, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 384205722}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1087228837
 GameObject:
   m_ObjectHideFlags: 0
@@ -134222,6 +134254,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gameplayManager: {fileID: 203195491}
+  bossTransform: {fileID: 384205722}
+  bossSpriteRenderer: {fileID: 1987177917}
+  bossAlmostDeadOverlaySpriteRenderer: {fileID: 777967649}
+  defaultSpriteMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  hitSpriteMaterial: {fileID: 2100000, guid: a39a8e677c4655c42aaaa6cb9a4cb68d, type: 2}
+  bossShaker: {fileID: 384205723}
+  bombProjectile: {fileID: 6510492326339341095, guid: 000a83a0ca35e5643bc3498665cfefa1, type: 3}
+  healthBarParent: {fileID: 1568470637}
+  healthBarCurrent: {fileID: 2141959115}
+  healthBarBefore: {fileID: 962759366}
+  bombProjectileStart: {fileID: 1086343632}
+  bombProjectilePrefab: {fileID: 6510492326339341095, guid: 000a83a0ca35e5643bc3498665cfefa1, type: 3}
   health:
     currentCryptoKey: 1725932275
     hiddenValue: 1725932263
@@ -134234,16 +134278,30 @@ MonoBehaviour:
     inited: 1
     fakeValue: 10
     fakeValueActive: 1
-  bossTransform: {fileID: 384205722}
-  bossSpriteRenderer: {fileID: 1987177917}
-  bossAlmostDeadOverlaySpriteRenderer: {fileID: 777967649}
-  defaultSpriteMaterial: {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  hitSpriteMaterial: {fileID: 2100000, guid: a39a8e677c4655c42aaaa6cb9a4cb68d, type: 2}
-  bossShaker: {fileID: 384205723}
-  bombProjectile: {fileID: 6510492326339341095, guid: 000a83a0ca35e5643bc3498665cfefa1, type: 3}
-  healthBarParent: {fileID: 1568470637}
-  healthBarCurrent: {fileID: 2141959115}
-  healthBarBefore: {fileID: 962759366}
+  moveSpeed:
+    migratedVersion: 
+    currentCryptoKey: 1790410375
+    hiddenValue: 712963975
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    inited: 1
+    fakeValue: 3
+    fakeValueActive: 1
+  bossOnStageYPosition:
+    migratedVersion: 
+    currentCryptoKey: 2045082288
+    hiddenValue: 968264061
+    hiddenValueOldByte4:
+      b1: 0
+      b2: 0
+      b3: 0
+      b4: 0
+    inited: 1
+    fakeValue: 3.7
+    fakeValueActive: 1
 --- !u!1 &1728399962
 GameObject:
   m_ObjectHideFlags: 0

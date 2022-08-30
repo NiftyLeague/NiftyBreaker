@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 	public SpriteRenderer almostDeadEffectSpriteRenderer;
 	public GameObject chargeEffectClouds;
 	public Transform playerTransform;
-
+	private bool canGetHit = true;
 	private InputState input = new InputState();
 	bool canPlayChargeEffect = true;
 	float almostDeadAlpha;
@@ -103,6 +103,26 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	IEnumerator HurtFlash()
+	{
+		canGetHit = false;
+
+		for (int i = 0; i < 30; i++)
+		{
+			playerSpriteRenderer.gameObject.SetActive(!playerSpriteRenderer.gameObject.activeInHierarchy);
+			yield return new WaitForSeconds(0.05f);
+		}
+
+		playerSpriteRenderer.gameObject.SetActive(true);
+
+		canGetHit = true;
+	}
+
+	public void AnimateHurtFlash()
+	{
+		StartCoroutine(HurtFlash());
+	}
+
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
 		if (collision.CompareTag("Powerup"))
@@ -113,8 +133,13 @@ public class PlayerController : MonoBehaviour
 
 		if (collision.CompareTag("Bomb"))
 		{
+			if (!canGetHit)
+			{
+				return;
+			}
+
 			collision.GetComponent<Bomb>().BlowUpBomb();
-			gameplayManager.LoseLife();
+			gameplayManager.LoseLife(true);
 		}
 	}
 }

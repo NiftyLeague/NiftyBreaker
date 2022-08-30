@@ -13,6 +13,7 @@ public class GameplayManager : MonoBehaviour
 	public BossController bossController;
 	public AudioManager audioManager;
 	public Character playerCharacter;
+	public PlayerController playerController;
 	public TransitionManager transitionManager;
 	[Space]
 	public int currentlevel = 1;
@@ -228,7 +229,7 @@ public class GameplayManager : MonoBehaviour
 		ResetBall();
 	}
 
-	public void LoseLife()
+	public void LoseLife(bool animateHurtFlash = false)
 	{
 		if (godMode)
 		{
@@ -240,6 +241,11 @@ public class GameplayManager : MonoBehaviour
 		if (lives <= 0)
 		{
 			Lose();
+		}
+
+		if (animateHurtFlash)
+		{
+			playerController.AnimateHurtFlash();
 		}
 	}
 
