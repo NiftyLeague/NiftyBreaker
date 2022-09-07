@@ -132,10 +132,10 @@ public class BallHitter : MonoBehaviour
 
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
-		Ball ball = collision.gameObject.GetComponent<Ball>();
-
-		if (ball != null)
+		if (collision.CompareTag("Projectile"))
 		{
+			Ball ball = collision.gameObject.GetComponent<Ball>();
+
 			if (ball.hasBeenHitRecently)
 			{
 				return;
@@ -145,6 +145,11 @@ public class BallHitter : MonoBehaviour
 			EffectsController.CreateHitEffect(collision.transform.position, currentChargeAmount / 10, false);
 			gameplayManager.SetBallOwnership(playerOwnership);
 			gameplayManager.cameraShake.Shake(0.2f * currentChargeAmount, 1);
+		}
+
+		if (collision.CompareTag("Boss"))
+		{
+			gameplayManager.bossController.TakeDamage(1);
 		}
 	}
 }

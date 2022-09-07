@@ -44,6 +44,7 @@ public class BossController : MonoBehaviour
     private ObscuredFloat attackingTimer;
     private ObscuredFloat nextAttackTimer;
     private ObscuredBool isTackleSlamming;
+    private ObscuredBool canTakeDamage = true;
 
     private void Start()
     {
@@ -82,7 +83,7 @@ public class BossController : MonoBehaviour
                 SetDirection(FacingDirection.Left);
             }
 
-            bossTransform.Translate((currentMoveDirection * moveSpeed) * Time.deltaTime);
+            bossTransform.Translate((currentMoveDirection * (moveSpeed + (5 - health/4))) * Time.deltaTime);
         }
 
         if (isAttacking)
@@ -96,9 +97,11 @@ public class BossController : MonoBehaviour
                 switch (currentActionPhase)
                 {
                     case ActionPhase.DropDombs:
+                        gameplayManager.audioManager.PlaySound("BossDropBomb");
                         Instantiate(bombProjectilePrefab, bombProjectileStart.position, bombProjectilePrefab.transform.rotation, transform);
                         break;
                     case ActionPhase.FireLasers:
+                        gameplayManager.audioManager.PlaySound("BossFireLaser");
                         Instantiate(laserPrefab, laserStart.position, laserPrefab.transform.rotation, transform);
                         break;
                     case ActionPhase.PlaceBlocks:
@@ -114,6 +117,7 @@ public class BossController : MonoBehaviour
 
                         if (bossBricksToChooseFrom.Count > 0) 
                         {
+                            gameplayManager.audioManager.PlaySound("BossSpawnBrick");
                             bossBricksToChooseFrom[Random.Range(0, bossBricksToChooseFrom.Count)].InitializeBrick(Random.Range(1, 5), false, Random.value > 0.8f, true);
                         }
                         break;
@@ -167,7 +171,7 @@ public class BossController : MonoBehaviour
             dustcloud.gameObject.SetActive(true);
             dustcloud.Play();
         }
-
+        gameplayManager.audioManager.PlaySound("BossSlamGround");
         gameplayManager.cameraShake.Shake(0.8f, 8);
 
         yield return new WaitForSeconds(0.6f);
@@ -194,6 +198,12 @@ public class BossController : MonoBehaviour
 
     public void TakeDamage(int amount = 1)
     {
+        if (!canTakeDamage)
+        {
+            return;
+        }
+
+        gameplayManager.audioManager.PlaySound("BossTakeDamage");
         StartCoroutine(TakeDamageAnimation());
         health -= amount;
         UpdateHealthBar();
@@ -220,14 +230,19 @@ public class BossController : MonoBehaviour
 
     public void EndBossFight()
     {
-        //isBossModeOn = false;
-        //CanHurtThePlayer(false);
+        isBossModeOn = false;
         bossAlmostDeadOverlaySpriteRenderer.color = new Color(bossAlmostDeadOverlaySpriteRenderer.color.r, bossAlmostDeadOverlaySpriteRenderer.color.g, bossAlmostDeadOverlaySpriteRenderer.color.b, 0);
         if (currentActionCoroutine != null)
         {
             StopCoroutine(currentActionCoroutine);
         }
         StopAllCoroutines();
+    }
+
+    public void LostBossFight()
+    {
+        EndBossFight();
+        StartCoroutine(LeaveArenaAnimation());
     }
 
     void SetDirection(FacingDirection direction)
@@ -247,12 +262,16 @@ public class BossController : MonoBehaviour
 
     IEnumerator TakeDamageAnimation()
     {
+        canTakeDamage = false;
+
         bossShaker.Shake(0.2f, 10);
         bossSpriteRenderer.material = hitSpriteMaterial;
 
         yield return new WaitForSeconds(0.1f);
 
         bossSpriteRenderer.material = defaultSpriteMaterial;
+
+        canTakeDamage = true;
     }
 
     void PerformNextAttack()
@@ -281,6 +300,17 @@ public class BossController : MonoBehaviour
         }
 
         return 0;
+    }
+
+    IEnumerator LeaveArenaAnimation()
+    {
+        Tween<float> yPositionTweenRise = new Tween<float>(bossTransform.position.y, 15, 2f, TweenEaseType.CubicOut);
+
+        while (!yPositionTweenRise.IsEnded())
+        {
+            yield return new WaitForEndOfFrame();
+            bossTransform.position = new Vector3(bossTransform.position.x, yPositionTweenRise.Update(Time.deltaTime), 0);
+        }
     }
 }
 

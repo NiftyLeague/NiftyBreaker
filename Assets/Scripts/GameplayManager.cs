@@ -300,12 +300,14 @@ public class GameplayManager : MonoBehaviour
 		{
 			return;
 		}
+		
 		TurnOffAllPowerups();
 		hasGameEnded = true;
 		cameraShake.Shake(0.5f, 5);
 		IncreaseSpeed(true);
 		playerCharacter.Lose();
 		balls[0].gameObject.SetActive(false);
+		bossController.LostBossFight();
 		menuManager.UpdateLeaderboards();
 		//EventController.AddMatchEnd(PlayerSpriteManager.lastDegenIdUsed);
 
