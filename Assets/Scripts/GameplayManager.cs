@@ -446,6 +446,10 @@ public class GameplayManager : MonoBehaviour
 
 	public void Hit(int points)
 	{
+		if (points <= 0)
+		{
+			return;
+		}
 		points = (int)(points * multiplier);
 		multiplier += 0.1f;
 		ScorePoints(points);

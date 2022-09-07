@@ -141,5 +141,15 @@ public class PlayerController : MonoBehaviour
 			collision.GetComponent<Bomb>().BlowUpBomb();
 			gameplayManager.LoseLife(true);
 		}
+
+		if (collision.CompareTag("Laser"))
+		{
+			if (!canGetHit)
+			{
+				return;
+			}
+
+			gameplayManager.LoseLife(true);
+		}
 	}
 }

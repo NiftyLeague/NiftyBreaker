@@ -21,6 +21,7 @@ public class Brick : MonoBehaviour
 
     public bool unbreakable;
     public bool bomb;
+    bool bossBrick;
     bool hasPowerup;
     bool firstTimeActivated = true;
 
@@ -69,14 +70,19 @@ public class Brick : MonoBehaviour
         {
             pointsGained *= 2;
         }
+        if (bossBrick)
+        {
+            pointsGained = 0;
+        }
         gameplayManager.Hit(pointsGained);
     }
 
-    public void InitializeBrick(int health, bool indestructableBrick = false, bool bombBrick = false)
+    public void InitializeBrick(int health, bool indestructableBrick = false, bool bombBrick = false, bool bossBrick = false)
     {
         this.health = health;
         unbreakable = indestructableBrick;
         bomb = bombBrick;
+        this.bossBrick = bossBrick;
 
         ActivateBrick();
     }

@@ -20,22 +20,43 @@ public class BossController : MonoBehaviour
     public Image healthBarBefore;
     public Transform bombProjectileStart;
     public GameObject bombProjectilePrefab;
+    public Transform laserStart;
+    public GameObject laserPrefab;
+    public Transform bossStageBlocks;
+    public List<SimpleAnim> landingDustClouds;
     [Space]
     public ObscuredInt health = 20;
     public ObscuredInt almostDeadHealth = 10;
     public ObscuredFloat moveSpeed = 5;
     [Space]
-    public ObscuredFloat bossOnStageYPosition = -0.82f;
+    public ObscuredFloat bossTopStageYPosition = 3.7f;
+    public ObscuredFloat bossBottomStageYPosition = -6f;
 
+    [HideInInspector] public ObscuredBool isBossModeOn = false;
+    private ActionPhase currentActionPhase;
     private Vector2 currentMoveDirection = Vector2.left;
-    private bool isMoving = true;
+    private ObscuredBool isMoving = true;
+    private ObscuredBool isAttacking = false; 
     private float almostDeadAlpha;
     private Coroutine currentActionCoroutine;
     private float healthBarBeforeAmount;
-    private float bombDropTimer = 1;
+    private ObscuredFloat attackActionTimer = 1;
+    private ObscuredFloat attackingTimer;
+    private ObscuredFloat nextAttackTimer;
+    private ObscuredBool isTackleSlamming;
+
+    private void Start()
+    {
+        isBossModeOn = true;
+    }
 
     private void Update()
     {
+        if (!isBossModeOn) 
+        {
+            return;
+        }
+
         bossAlmostDeadOverlaySpriteRenderer.sprite = bossSpriteRenderer.sprite;
 
         if (health <= almostDeadHealth)
@@ -48,32 +69,121 @@ public class BossController : MonoBehaviour
         healthBarBeforeAmount = Mathf.Lerp(healthBarBeforeAmount, (float)health, 0.005f);
         healthBarBefore.fillAmount = healthBarBeforeAmount / (float)20;
 
-        if (!isMoving)
+        if (isMoving)
         {
-            return;
+            if (bossTransform.position.x <= -11f)
+            {
+                bossTransform.position = new Vector2(-10, bossTopStageYPosition);
+                SetDirection(FacingDirection.Right);
+            }
+            else if (bossTransform.position.x >= 11f)
+            {
+                bossTransform.position = new Vector2(10, bossTopStageYPosition);
+                SetDirection(FacingDirection.Left);
+            }
+
+            bossTransform.Translate((currentMoveDirection * moveSpeed) * Time.deltaTime);
         }
 
-        if (bossTransform.position.x <= -11f)
+        if (isAttacking)
         {
-            bossTransform.position = new Vector2(-10, bossOnStageYPosition);
-            SetDirection(FacingDirection.Right);
+            attackActionTimer -= Time.deltaTime;
+
+            if (attackActionTimer <= 0)
+            {
+                attackActionTimer = GetNewActionTimerAmount();
+
+                switch (currentActionPhase)
+                {
+                    case ActionPhase.DropDombs:
+                        Instantiate(bombProjectilePrefab, bombProjectileStart.position, bombProjectilePrefab.transform.rotation, transform);
+                        break;
+                    case ActionPhase.FireLasers:
+                        Instantiate(laserPrefab, laserStart.position, laserPrefab.transform.rotation, transform);
+                        break;
+                    case ActionPhase.PlaceBlocks:
+                        List<Brick> bossBricksToChooseFrom = new List<Brick>();
+                    
+                        for (int i = 0; i < bossStageBlocks.childCount; i++)
+                        {
+                            if (!bossStageBlocks.GetChild(i).gameObject.activeInHierarchy)
+                            {
+                                bossBricksToChooseFrom.Add(bossStageBlocks.GetChild(i).GetComponent<Brick>());
+                            }
+                        }
+
+                        if (bossBricksToChooseFrom.Count > 0) 
+                        {
+                            bossBricksToChooseFrom[Random.Range(0, bossBricksToChooseFrom.Count)].InitializeBrick(Random.Range(1, 5), false, Random.value > 0.8f, true);
+                        }
+                        break;
+                    case ActionPhase.TackleGround:
+                        if (!isTackleSlamming)
+                        {
+                            StartCoroutine(TackleGroundAnimation());
+                        }
+                        break;
+                }
+            }
+
+            attackingTimer -= Time.deltaTime;
+
+            if (attackingTimer <= 0)
+            {
+                if (!isTackleSlamming)
+                {
+                    isAttacking = false;
+                }
+            }   
         }
-        else if (bossTransform.position.x >= 11f)
+        else
         {
-            bossTransform.position = new Vector2(10, bossOnStageYPosition);
-            SetDirection(FacingDirection.Left);
+            nextAttackTimer -= Time.deltaTime;
+
+            if (nextAttackTimer <= 0)
+            {
+                nextAttackTimer = UnityEngine.Random.Range(1, 4);
+                isAttacking = true;
+                PerformNextAttack();
+            }
         }
+    }
 
-        bombDropTimer -= Time.deltaTime;
+    IEnumerator TackleGroundAnimation()
+    {
+        isMoving = false;
+        isTackleSlamming = true;
 
-        if (bombDropTimer <= 0)
+        Tween<float> yPositionTweenDrop = new Tween<float>(bossTopStageYPosition, bossBottomStageYPosition, 0.8f, TweenEaseType.CubicIn);
+
+        while (!yPositionTweenDrop.IsEnded())
         {
-            bombDropTimer = Random.Range(0.1f, 2.0f);
-
-            Instantiate(bombProjectilePrefab, bombProjectileStart.position, bombProjectilePrefab.transform.rotation, transform);
+            yield return new WaitForEndOfFrame();
+            bossTransform.position = new Vector3(bossTransform.position.x, yPositionTweenDrop.Update(Time.deltaTime), 0);
         }
 
-        bossTransform.Translate((currentMoveDirection * moveSpeed) * Time.deltaTime);
+        foreach (SimpleAnim dustcloud in landingDustClouds)
+        {
+            dustcloud.gameObject.SetActive(true);
+            dustcloud.Play();
+        }
+
+        gameplayManager.cameraShake.Shake(0.8f, 8);
+
+        yield return new WaitForSeconds(0.6f);
+
+        Tween<float> yPositionTweenRise = new Tween<float>(bossBottomStageYPosition, bossTopStageYPosition, 1f, TweenEaseType.CubicOut);
+
+        while (!yPositionTweenRise.IsEnded())
+        {
+            yield return new WaitForEndOfFrame();
+            bossTransform.position = new Vector3(bossTransform.position.x, yPositionTweenRise.Update(Time.deltaTime), 0);
+        }
+
+        yield return new WaitForSeconds(0.2f);
+
+        isMoving = true;
+        isTackleSlamming = false;
     }
 
     void UpdateHealthBar()
@@ -93,6 +203,11 @@ public class BossController : MonoBehaviour
             healthBarParent.SetActive(false);
             WonBossFight();
         }
+    }
+
+    public void StartBossFight()
+    {
+        isBossModeOn = true;
     }
 
     public void WonBossFight()
@@ -139,6 +254,34 @@ public class BossController : MonoBehaviour
 
         bossSpriteRenderer.material = defaultSpriteMaterial;
     }
+
+    void PerformNextAttack()
+    {
+        int nextAttack = UnityEngine.Random.Range(1, 5);
+        currentActionPhase = (ActionPhase)nextAttack;
+        attackingTimer = Random.Range(8.0f, 12.0f);
+    }
+
+    float GetNewActionTimerAmount()
+    {
+        switch (currentActionPhase)
+        {
+            case ActionPhase.DropDombs:
+                return Random.Range(0.1f, 2.0f);
+                break;
+            case ActionPhase.FireLasers:
+                return Random.Range(1.0f, 4.0f);
+                break;
+            case ActionPhase.PlaceBlocks:
+                return Random.Range(1.0f, 4.0f);
+                break;
+            case ActionPhase.TackleGround:
+                return Random.Range(2.0f, 6.0f);
+                break;
+        }
+
+        return 0;
+    }
 }
 
 public enum FacingDirection
@@ -146,4 +289,13 @@ public enum FacingDirection
     None,
     Left,
     Right,
+}
+
+public enum ActionPhase
+{
+    Idle,
+    DropDombs,
+    FireLasers,
+    PlaceBlocks,
+    TackleGround,
 }
